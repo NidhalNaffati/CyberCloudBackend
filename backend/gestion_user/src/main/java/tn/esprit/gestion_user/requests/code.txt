@@ -1,0 +1,127 @@
+Given this code here try to update the component based on the backend code below:
+
+@RestController
+@RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
+public class AuthenticationController {
+
+    private final AuthenticationService authenticationService;
+
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
+        authenticationService.registerUser(request);
+        return ResponseEntity.ok("Registration successful. Check your email for verification code.");
+    }
+
+    @PostMapping("/verify-user")
+    public ResponseEntity<String> verifyAccount(@RequestBody VerifyAccountRequest request) {
+        authenticationService.verifyUserAccount(request.getEmail(), request.getCode());
+        return ResponseEntity.ok("Account verified successfully");
+    }
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
+        return ResponseEntity.ok(authenticationService.authenticate(request));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        authenticationService.sendResetPasswordCodeToUser(request.getEmail());
+        return ResponseEntity.ok("Password reset code sent to your email");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authenticationService.resetPassword(
+            request.getEmail(),
+            request.getCode(),
+            request.getNewPassword(),
+            request.getConfirmPassword()
+        );
+        return ResponseEntity.ok("Password reset successful");
+    }
+}
+
+
+public record AuthenticationRequest(
+        String email,
+
+        String password
+) {
+
+}
+
+public record AuthenticationResponse(
+        @JsonProperty("access_token")
+        String accessToken,
+        @JsonProperty("refresh_token")
+        String refreshToken
+) {
+}
+public class ForgotPasswordRequest {
+    private String email;
+}
+public record RegisterRequest(
+    @Length(min = 3, max = 16,
+        message = "first name length should be less than 16 and more than 3 ")
+    String firstName,
+
+    @Length(min = 3, max = 16,
+        message = "last name length should be less than 16 and more than 3 ")
+    String lastName,
+
+
+    @Email(message = "Email should be valid")
+    @NotNull(message = "Email shouldn't be null")
+    @Length(min = 3, message = "email length should be more than 10 ")
+    String email,
+
+    @NotNull(message = "Password shouldn't be null ")
+    @Length(min = 8, max = 16, message = "password length should be more than 8 and less than 16")
+    String password,
+
+    @NotNull
+    String confirmPassword,
+
+    Role role
+) {
+    public User toUser() {
+        return User.builder()
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .password(password)
+            .confirmPassword(confirmPassword)
+            .role(role)
+            .accountNonLocked(true)
+            .enabled(false)
+            .failedAttempts(0)
+            .build();
+    }
+}
+public class ResetPasswordRequest {
+        private String email;
+        private String code;
+        private String newPassword;
+        private String confirmPassword;
+}
+public record UpdatePasswordRequest(
+        @NotNull
+        String token,
+
+        @NotNull(message = "Password shouldn't be null ")
+        @Length(min = 8, max = 16, message = "password length should be more than 8 and less than 16")
+        String password,
+
+        @NotNull(message = "Password Confirm shouldn't be null ")
+        String passwordConfirm
+) {
+}
+public class VerifyAccountRequest {
+    private String email;
+    private String code;
+}
+
+
+
+Here is the component that you need to update:
