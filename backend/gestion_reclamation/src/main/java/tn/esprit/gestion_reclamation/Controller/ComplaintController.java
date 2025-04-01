@@ -1,0 +1,49 @@
+package tn.esprit.gestion_reclamation.Controller;
+
+import tn.esprit.gestion_reclamation.entities.Complaint;
+import tn.esprit.gestion_reclamation.services.ComplaintService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/complaints")
+@Tag(name = "Complaints", description = "Management of user complaints") // ✅ Added the Swagger tag in English
+public class ComplaintController {
+
+    @Autowired
+    private ComplaintService complaintService;
+
+    @Operation(summary = "Add a complaint", description = "Allows a user to add a new complaint.")
+    @PostMapping
+    public Complaint addComplaint(@RequestBody Complaint complaint) {
+        return complaintService.addComplaint(complaint);
+    }
+
+    @Operation(summary = "Update a complaint", description = "Allows updating an existing complaint by its ID.")
+    @PutMapping("/{complaintId}")
+    public Complaint updateComplaint(@PathVariable int complaintId, @RequestBody Complaint complaint) {
+        return complaintService.updateComplaintById(complaintId, complaint);
+    }
+
+    @Operation(summary = "Delete a complaint", description = "Allows deleting an existing complaint by its ID.")
+    @DeleteMapping("/{complaintId}")
+    public void deleteComplaint(@PathVariable int complaintId) {
+        complaintService.deleteComplaint(complaintId);
+    }
+
+    @Operation(summary = "List all complaints", description = "Allows retrieving all existing complaints.")
+    @GetMapping
+    public List<Complaint> getAllComplaints() {
+        return complaintService.getAllComplaints();
+    }
+
+    @Operation(summary = "Get details of a complaint", description = "Allows retrieving details of a specific complaint by its ID.")
+    @GetMapping("/{complaintId}")
+    public Complaint getComplaintById(@PathVariable int complaintId) {
+        return complaintService.getComplaintById(complaintId);
+    }
+}
