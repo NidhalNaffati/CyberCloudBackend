@@ -51,7 +51,18 @@ public class ActivityServiceImpl implements IActivityService {
         }).orElseThrow(() -> new ResourceNotFoundException("Activity not found with ID: " + id));
     }
 
+    @Override
+    public Activity updateAvailableSeats(Long id, int seatsToRemove) {
+        Activity activity = activityRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
 
+        if (seatsToRemove > activity.getAvailableSeats()) {
+            throw new IllegalArgumentException("Not enough available seats");
+        }
+
+        activity.setAvailableSeats(activity.getAvailableSeats() - seatsToRemove);
+        return activityRepository.save(activity);
+    }
     @Override
     public void deleteActivity(Long id) {
         activityRepository.deleteById(id);

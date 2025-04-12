@@ -1,23 +1,34 @@
 package tn.esprit.gestion_activities.controller;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import tn.esprit.gestion_activities.entity.Activity;
 import tn.esprit.gestion_activities.entity.ActivityReservation;
 import tn.esprit.gestion_activities.exception.ResourceNotFoundException;
+import tn.esprit.gestion_activities.service.ActivityReservationServiceImpl;
 import tn.esprit.gestion_activities.service.IActivityReservationService;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.gestion_activities.service.IActivityService;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static org.hibernate.query.sqm.tree.SqmNode.log;
+
 @RestController
 @RequestMapping("/reservations")
 public class ActivityReservationController {
 
     private final IActivityReservationService reservationService;
     private final IActivityService activityService;
-
+    private static final Logger logger = LoggerFactory.getLogger(ActivityReservationServiceImpl.class);
     public ActivityReservationController(IActivityReservationService reservationService,
                                          IActivityService activityService) {
         this.reservationService = reservationService;
@@ -25,18 +36,31 @@ public class ActivityReservationController {
     }
 
     @PostMapping("/activity/{activityId}/create")
-    public ActivityReservation createReservation(@PathVariable Long activityId,
-                                                 @Valid @RequestBody ActivityReservation reservation) {
-        Optional<Activity> activityOptional = activityService.getActivityById(activityId);
-        if (!activityOptional.isPresent()) {
-            throw new ResourceNotFoundException("Activity not found with ID: " + activityId);
+    public ResponseEntity<?> createReservation(
+            @PathVariable Long activityId,
+            @Valid @RequestBody ActivityReservation reservation) {
+
+        try {
+            logger.info("Attempting to create reservation for activity {}", activityId);
+            Activity activity = activityService.getActivityById(activityId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
+
+            reservation.setActivity(activity);
+            reservation.setReservationDate(new Date());
+
+            ActivityReservation createdReservation = reservationService.createReservation(reservation);
+            logger.info("Successfully created reservation {}", createdReservation.getActivityReservationId());
+            return ResponseEntity.ok(createdReservation);
+
+        } catch (Exception e) {
+            logger.error("Failed to create reservation", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "error", "Failed to create reservation",
+                            "message", e.getMessage(),
+                            "timestamp", Instant.now()
+                    ));
         }
-
-        Activity activity = activityOptional.get();
-        reservation.setActivity(activity);
-        reservation.setReservationDate(new Date());
-
-        return reservationService.createReservation(reservation);
     }
 
     @GetMapping("/{id}")

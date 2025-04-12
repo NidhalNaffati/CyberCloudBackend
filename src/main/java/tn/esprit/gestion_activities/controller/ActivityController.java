@@ -1,9 +1,7 @@
 package tn.esprit.gestion_activities.controller;
 
-
-import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,12 +30,19 @@ import java.util.UUID;
 public class ActivityController {
 
     private final IActivityService activityService;
-    private static final String UPLOAD_DIR = "uploads/"; // Chemin de stockage des images
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    private final String uploadDir;
 
     public ActivityController(IActivityService activityService) {
         this.activityService = activityService;
+        this.uploadDir = System.getProperty("user.home") + "/uploads/";
+        createUploadDirectory();
+    }
+
+    private void createUploadDirectory() {
+        File directory = new File(uploadDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
     }
 
     @PostMapping("/add")
@@ -51,23 +56,11 @@ public class ActivityController {
             @RequestParam(value = "image", required = false) MultipartFile file) {
 
         try {
-            // Dossier de téléchargement
-            String uploadDir = System.getProperty("user.home") + "/uploads/";
-            File directory = new File(uploadDir);
-            if (!directory.exists()) {
-                directory.mkdirs(); // Création du répertoire s'il n'existe pas
-            }
-
-            String filePath = null;
+            String fileName = null;
             if (file != null && !file.isEmpty()) {
-                // Générer un nom de fichier unique
-                String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-                filePath = uploadDir + fileName;
-                // Sauvegarder le fichier
-                file.transferTo(new File(filePath));
+                fileName = saveUploadedFile(file);
             }
 
-            // Créer l'activité
             Activity activity = new Activity();
             activity.setName(name);
             activity.setDetails(details);
@@ -75,27 +68,29 @@ public class ActivityController {
             activity.setAvailableSeats(availableSeats);
             activity.setDate(date);
             activity.setPrice(price);
-            activity.setImagePath(filePath); // Enregistrer le chemin de l'image
+            activity.setImagePath(fileName); // Stocker uniquement le nom du fichier
 
-            // Sauvegarder l'activité dans la base de données
             activityService.createActivity(activity);
 
-            // Retourner une réponse JSON valide
-            ResponseMessage responseMessage = new ResponseMessage("Activité ajoutée avec succès !");
-            return ResponseEntity.ok(responseMessage);
-
+            return ResponseEntity.ok(new ResponseMessage("Activité ajoutée avec succès !"));
         } catch (Exception e) {
-            e.printStackTrace(); // Affiche l'erreur dans les logs du serveur
-            // Retourner une erreur en cas de problème
-            ResponseMessage errorMessage = new ResponseMessage("Erreur lors de l'ajout de l'activité");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Erreur lors de l'ajout de l'activité"));
         }
+    }
+
+    private String saveUploadedFile(MultipartFile file) throws IOException {
+        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        Path filePath = Paths.get(uploadDir + fileName);
+        file.transferTo(filePath);
+        return fileName;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Activity> getActivityById(@PathVariable Long id) {
-        Optional<Activity> activity = activityService.getActivityById(id);
-        return activity.map(ResponseEntity::ok)
+        return activityService.getActivityById(id)
+                .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("Activity not found with ID: " + id));
     }
 
@@ -103,82 +98,90 @@ public class ActivityController {
     public List<Activity> getAllActivities() {
         return activityService.getAllActivities();
     }
-    @GetMapping("/activities/images/{imageName}")
-    public ResponseEntity<Resource> getImage(@PathVariable String imageName) throws IOException {
-        // Define the path to the image
-        Path path = Paths.get("C:/Users/R I B/Desktop/gestion_activities/src/main/java/tn/esprit/gestion_activities/uploads/activities/images/")
-                .resolve(imageName);
 
-        // Create a Resource object from the file path
-        Resource resource = (Resource) new FileSystemResource(path);
+    @GetMapping("/images/{filename:.+}")
+    public ResponseEntity<Resource> serveImage(@PathVariable String filename) {
+        try {
+            Path filePath = Paths.get(uploadDir).resolve(filename);
+            Resource resource = new FileSystemResource(filePath);
 
-        // Check if the file exists
-        if (!((FileSystemResource) resource).exists()) {
-            return ResponseEntity.notFound().build();
+            if (resource.exists() || resource.isReadable()) {
+                String contentType = Files.probeContentType(filePath);
+                if (contentType == null) {
+                    contentType = "application/octet-stream";
+                }
+
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_TYPE, contentType)
+                        .body(resource);
+            }
+        } catch (IOException e) {
+            // Log the error
         }
-
-        // Get the content type of the file
-        String contentType = Files.probeContentType(path);
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
-
-        // Return the image as a response
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(resource);
+        return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ResponseMessage> updateActivity(@PathVariable("id") Long id,
-                                                          @RequestParam("name") String name,
-                                                          @RequestParam("details") String details,
-                                                          @RequestParam("location") String location,
-                                                          @RequestParam("availableSeats") int availableSeats,
-                                                          @RequestParam("date") String date,
-                                                          @RequestParam("price") double price,
-                                                          @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
+    public ResponseEntity<ResponseMessage> updateActivity(
+            @PathVariable("id") Long id,
+            @RequestParam("name") String name,
+            @RequestParam("details") String details,
+            @RequestParam("location") String location,
+            @RequestParam("availableSeats") int availableSeats,
+            @RequestParam("date") String date,
+            @RequestParam("price") double price,
+            @RequestParam(value = "image", required = false) MultipartFile image) {
 
-        Optional<Activity> existingActivityOptional = activityService.getActivityById(id);
+        try {
+            Activity existingActivity = activityService.getActivityById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Activity not found with ID: " + id));
 
-        if (existingActivityOptional.isPresent()) {
-            Activity existingActivity = existingActivityOptional.get();
             existingActivity.setName(name);
             existingActivity.setDetails(details);
             existingActivity.setLocation(location);
             existingActivity.setAvailableSeats(availableSeats);
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate parsedDate = LocalDate.parse(date, formatter);
-            existingActivity.setDate(parsedDate);
+            existingActivity.setDate(LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             existingActivity.setPrice(price);
 
             if (image != null && !image.isEmpty()) {
-                String uploadDir = System.getProperty("user.home") + "/uploads/";
-                File directory = new File(uploadDir);
-                if (!directory.exists()) {
-                    directory.mkdirs();
-                }
-
-                String fileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
-                String filePath = uploadDir + fileName;
-                image.transferTo(new File(filePath));
-                existingActivity.setImagePath(filePath);
+                String fileName = saveUploadedFile(image);
+                existingActivity.setImagePath(fileName);
             }
 
-            // Appeler la méthode updateActivity avec ID et l'activité mise à jour
             activityService.updateActivity(id, existingActivity);
-
-            ResponseMessage responseMessage = new ResponseMessage("Activité mise à jour avec succès !");
-            return ResponseEntity.ok(responseMessage);
-        } else {
-            throw new ResourceNotFoundException("Activity not found with ID: " + id);
+            return ResponseEntity.ok(new ResponseMessage("Activité mise à jour avec succès !"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Erreur lors de la mise à jour"));
         }
     }
+    @PatchMapping("/{id}/seats")
+    public ResponseEntity<Activity> updateSeats(
+            @PathVariable Long id,
+            @RequestParam int seats) {
 
+        Activity updatedActivity = activityService.updateAvailableSeats(id, seats);
+        return ResponseEntity.ok(updatedActivity);
+    }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteActivity(@PathVariable("id") Long id) {
         activityService.deleteActivity(id);
         return ResponseEntity.noContent().build();
+    }
+
+    public static class ResponseMessage {
+        private String message;
+
+        public ResponseMessage(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
     }
 }

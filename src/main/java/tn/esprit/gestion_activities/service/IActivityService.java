@@ -12,4 +12,6 @@ public interface IActivityService {
     Activity updateActivity(Long id, Activity updatedActivity);
     void deleteActivity(Long id);
     boolean existsById(Long id);
+
+    Activity updateAvailableSeats(Long id, int seats);
 }

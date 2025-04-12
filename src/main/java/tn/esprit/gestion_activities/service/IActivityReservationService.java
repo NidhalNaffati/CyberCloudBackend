@@ -1,5 +1,6 @@
 package tn.esprit.gestion_activities.service;
 
+import tn.esprit.gestion_activities.entity.Activity;
 import tn.esprit.gestion_activities.entity.ActivityReservation;
 import java.util.List;
 import java.util.Optional;
@@ -11,4 +12,7 @@ public interface IActivityReservationService {
     void deleteReservation(Long id);
 
     ActivityReservation updateReservation(ActivityReservation reservation);
+
+    Activity updateAvailableSeats(Long activityId, int seatsToRemove);
+
 }
