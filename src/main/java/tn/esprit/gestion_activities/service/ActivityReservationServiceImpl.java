@@ -90,4 +90,5 @@ public class ActivityReservationServiceImpl implements IActivityReservationServi
         activity.setAvailableSeats(activity.getAvailableSeats() - seatsToRemove);
         return activityRepository.save(activity);
     }
+
 }

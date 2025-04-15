@@ -13,8 +13,9 @@ import tn.esprit.gestion_activities.service.ActivityReservationServiceImpl;
 import tn.esprit.gestion_activities.service.IActivityReservationService;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.gestion_activities.service.IActivityService;
-
+import tn.esprit.gestion_activities.service.EmailService;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +29,13 @@ public class ActivityReservationController {
 
     private final IActivityReservationService reservationService;
     private final IActivityService activityService;
+    private final EmailService emailService;
     private static final Logger logger = LoggerFactory.getLogger(ActivityReservationServiceImpl.class);
     public ActivityReservationController(IActivityReservationService reservationService,
-                                         IActivityService activityService) {
+                                         IActivityService activityService , EmailService emailService) {
         this.reservationService = reservationService;
         this.activityService = activityService;
+        this.emailService = emailService;
     }
 
     @PostMapping("/activity/{activityId}/create")
@@ -67,6 +70,29 @@ public class ActivityReservationController {
     public Optional<ActivityReservation> getReservationById(@PathVariable Long id) {
         return reservationService.getReservationById(id);
     }
+    @PostMapping("/sendReminder/{reservationId}")
+    public ResponseEntity<?> sendManualReminder(@PathVariable Long reservationId) {
+        Optional<ActivityReservation> optionalReservation = reservationService.getReservationById(reservationId);
+        if (optionalReservation.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Reservation not found with ID: " + reservationId);
+        }
+
+        ActivityReservation reservation = optionalReservation.get();
+        LocalDate activityDate = reservation.getActivity().getDate();
+
+        String subject = "📅 Rappel de votre activité";
+        String body = String.format(
+                "Bonjour %s,\n\nCeci est un rappel manuel pour votre activité prévue le %s.\n\nÀ bientôt !",
+                reservation.getFullName(),
+                activityDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+        );
+
+        emailService.sendSimpleEmail(reservation.getEmail(), subject, body);
+
+        return ResponseEntity.ok("Email de rappel envoyé à " + reservation.getEmail());
+    }
+
 
     @GetMapping
     public List<ActivityReservation> getAllReservations() {

@@ -5,12 +5,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.gestion_activities.entity.Activity;
+import tn.esprit.gestion_activities.entity.WaitlistRegistration;
 import tn.esprit.gestion_activities.exception.ResourceNotFoundException;
+import tn.esprit.gestion_activities.repository.WaitlistRepository;
 import tn.esprit.gestion_activities.service.IActivityService;
 
 import java.io.File;
@@ -19,9 +20,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:4200")
@@ -30,10 +32,14 @@ import java.util.UUID;
 public class ActivityController {
 
     private final IActivityService activityService;
+    private final WaitlistRepository waitlistRepository; // final ajouté
+
     private final String uploadDir;
 
-    public ActivityController(IActivityService activityService) {
+
+    public ActivityController(IActivityService activityService,WaitlistRepository waitlistRepository ) {
         this.activityService = activityService;
+        this.waitlistRepository = waitlistRepository;
         this.uploadDir = System.getProperty("user.home") + "/uploads/";
         createUploadDirectory();
     }
@@ -155,12 +161,19 @@ public class ActivityController {
                     .body(new ResponseMessage("Erreur lors de la mise à jour"));
         }
     }
+
     @PatchMapping("/{id}/seats")
     public ResponseEntity<Activity> updateSeats(
             @PathVariable Long id,
             @RequestParam int seats) {
 
         Activity updatedActivity = activityService.updateAvailableSeats(id, seats);
+
+        // Vérification automatique de la waitlist
+        if (seats > 0) {
+            activityService.notifyWaitlist(id);
+        }
+
         return ResponseEntity.ok(updatedActivity);
     }
     @DeleteMapping("/delete/{id}")
@@ -168,20 +181,59 @@ public class ActivityController {
         activityService.deleteActivity(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/today")
+    public ResponseEntity<List<Activity>> getTodayActivities() {
+        List<Activity> todayActivities = activityService.recommanderActivitesSelonJour();
+        return ResponseEntity.ok(todayActivities);
+    }
+    @DeleteMapping("/cleanup")
+    public ResponseEntity<Void> cleanupPastActivities() {
+        activityService.supprimerActivitesPassees();
+        return ResponseEntity.noContent().build();
+    }
+    // ActivityController.java
+    @GetMapping("/{activityId}/waitlist/check")
+    public ResponseEntity<Boolean> checkWaitlistStatus(
+            @PathVariable Long activityId,
+            @RequestParam String email) {
 
-    public static class ResponseMessage {
-        private String message;
+        Activity activity = activityService.getActivityById(activityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
 
-        public ResponseMessage(String message) {
-            this.message = message;
+        boolean exists = waitlistRepository.existsByActivityAndEmail(activity, email);
+        return ResponseEntity.ok(exists);
+    }
+    // ActivityController.java
+    @PostMapping("/{activityId}/waitlist")
+    public ResponseEntity<?> joinWaitlist(
+            @PathVariable Long activityId,
+            @RequestBody Map<String, String> request) {
+
+        String email = request.get("email");
+
+        // Validation email
+        if (email == null || !email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            return ResponseEntity.badRequest().body("Email invalide");
         }
 
-        public String getMessage() {
-            return message;
+        Activity activity = activityService.getActivityById(activityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
+
+        if (activity.getAvailableSeats() > 0) {
+            return ResponseEntity.badRequest().body("Des places sont encore disponibles");
         }
 
-        public void setMessage(String message) {
-            this.message = message;
+        if (waitlistRepository.existsByActivityAndEmail(activity, email)) {
+            return ResponseEntity.badRequest().body("Email déjà inscrit");
         }
+
+        WaitlistRegistration registration = new WaitlistRegistration();
+        registration.setActivity(activity);
+        registration.setEmail(email);
+        registration.setRegistrationDate(LocalDateTime.now());
+
+        waitlistRepository.save(registration);
+
+        return ResponseEntity.ok().build();
     }
 }
