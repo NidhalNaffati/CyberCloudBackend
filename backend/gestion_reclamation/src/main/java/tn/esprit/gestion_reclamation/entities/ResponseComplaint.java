@@ -4,6 +4,8 @@ package tn.esprit.gestion_reclamation.entities;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class ResponseComplaint {
     @Id
@@ -16,6 +18,7 @@ public class ResponseComplaint {
     @ManyToOne
     @JoinColumn(name = "complaintId", nullable = false)
     private Complaint complaint;
+    private LocalDateTime dateRep; // ✅ Nouveau champ ajouté
 
     // Constructeurs
     public ResponseComplaint() {}
@@ -32,4 +35,6 @@ public class ResponseComplaint {
 
     public Complaint getComplaint() { return complaint; }
     public void setComplaint(Complaint complaint) { this.complaint = complaint; }
+    public LocalDateTime getDateRep() { return dateRep; }
+    public void setDateRep(LocalDateTime dateRep) { this.dateRep = dateRep; }
 }

@@ -1,5 +1,6 @@
 package tn.esprit.gestion_reclamation.Controller;
 
+import org.springframework.http.ResponseEntity;
 import tn.esprit.gestion_reclamation.entities.Complaint;
 import tn.esprit.gestion_reclamation.services.ComplaintService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+@CrossOrigin("*")
 
 @RestController
 @RequestMapping("/complaints")
@@ -46,4 +48,20 @@ public class ComplaintController {
     public Complaint getComplaintById(@PathVariable int complaintId) {
         return complaintService.getComplaintById(complaintId);
     }
+    @Operation(summary = "Get complaints by user ID", description = "Allows retrieving all complaints submitted by a specific user.")
+    @GetMapping("/user/{userId}")
+    public List<Complaint> getComplaintsByUser(@PathVariable int userId) {
+        return complaintService.getComplaintsByUser(userId);
+    }
+    @GetMapping("/unread")
+    public List<Complaint> getUnreadComplaintsOrderedByDate() {
+        return complaintService.getUnreadComplaintsOrderedByDateDesc();
+    }
+
+    @Operation(summary = "Mark a complaint as read", description = "Allows marking a complaint as read.")
+    @PutMapping("/{complaintId}/read")
+    public Complaint markComplaintAsRead(@PathVariable int complaintId) {
+        return complaintService.markComplaintAsRead(complaintId);
+    }
+
 }

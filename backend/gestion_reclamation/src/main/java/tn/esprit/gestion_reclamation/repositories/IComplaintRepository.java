@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface IComplaintRepository extends JpaRepository<Complaint, Integer> {
     List<Complaint> findByUserId(int userId);
+    List<Complaint> findByIsReadFalseOrderByDateDesc();
+
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/responses")
 @Tag(name = "Response to Complaints", description = "Management of responses to complaints") // ✅ Updated the tag to English

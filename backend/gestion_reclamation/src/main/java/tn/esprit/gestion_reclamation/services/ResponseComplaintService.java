@@ -7,6 +7,7 @@ import tn.esprit.gestion_reclamation.repositories.IResponseComplaintRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ public class ResponseComplaintService {
         Optional<Complaint> complaintOpt = complaintRepository.findById(complaintId);
         if (complaintOpt.isPresent()) {
             response.setComplaint(complaintOpt.get());
+            response.setDateRep(LocalDateTime.now());
             return responseRepository.save(response);
         }
         return null; // Retourne null si la plainte n'existe pas
@@ -35,6 +37,7 @@ public class ResponseComplaintService {
             ResponseComplaint existingResponse = existingResponseOpt.get();
             existingResponse.setContent(updatedResponse.getContent());
             existingResponse.setUserId(updatedResponse.getUserId());
+            existingResponse.setDateRep(LocalDateTime.now());
             return responseRepository.save(existingResponse);
         }
         return null; // Retourne null si la réponse n'existe pas
