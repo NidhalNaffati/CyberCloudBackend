@@ -1,12 +1,12 @@
 application:
-  name: gestion-users
+  name: speakly
 
 server:
   port: 8080
 
 spring:
   datasource:
-    url: jdbc:mysql://speekly_db:3306/speekly_db?createDatabaseIfNotExist=true
+    url: jdbc:mysql://speakly_db:3306/speakly_db?createDatabaseIfNotExist=true
     username: "root"
     password: "root"
     driver-class-name: com.mysql.cj.jdbc.Driver

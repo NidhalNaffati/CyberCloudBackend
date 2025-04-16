@@ -2,9 +2,9 @@ services:
   # MySQL Database
   mysql_db:
     image: mysql:latest
-    container_name: speekly_db
+    container_name: speakly_db
     environment:
-      MYSQL_DATABASE: speekly_db
+      MYSQL_DATABASE: speakly_db
       MYSQL_ROOT_PASSWORD: root
     ports:
       - "3306:3306"
