@@ -1,6 +1,8 @@
 package tn.esprit.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -44,9 +46,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    /**
-     * the user by default is not enable, until he activates his account.
-     */
     @Column(name = "enabled")
     private boolean enabled = false; // by default is false, until the user activates his account via email verification.
 
@@ -57,7 +56,6 @@ public class User {
     private Date createdAt;
 
     private Date updatedAt;
-
 
     @PrePersist
     protected void onCreate() {
@@ -74,4 +72,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
+    @JsonBackReference("user-appointments")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Appointment> appointments;
 }
