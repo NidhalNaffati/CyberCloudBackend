@@ -11,8 +11,8 @@
     <groupId>tn.esprit</groupId>
     <artifactId>speakly</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>backend</name>
-    <description>backend</description>
+    <name>speakly</name>
+    <description>speakly</description>
     <properties>
         <java.version>21</java.version>
     </properties>
