@@ -30,9 +30,11 @@ public class UserInitializer implements ApplicationRunner {
     @Value("${admin.password}")
     private String adminPassword;
 
-    private final String USERNAME = "user@mail.com";
+    @Value("${user.password}")
+    private String userUsername;
 
-    private final String USERPASSWORD = "password123";
+    @Value("${user.password}")
+    private String userPassword;
 
     private User buildAdminUser() {
         return User.builder()
@@ -51,9 +53,9 @@ public class UserInitializer implements ApplicationRunner {
         return User.builder()
             .firstName("User")
             .lastName("Demo")
-            .email(USERNAME)
-            .password(USERPASSWORD)
-            .confirmPassword(USERPASSWORD)
+            .email(userUsername)
+            .password(userPassword)
+            .confirmPassword(userPassword)
             .role(ROLE_USER)
             .enabled(true)
             .accountNonLocked(true)
@@ -63,7 +65,7 @@ public class UserInitializer implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         initializeUser(adminUsername, this::buildAdminUser, "Admin");
-        initializeUser(USERNAME, this::buildRegularUser, "Regular user");
+        initializeUser(userUsername, this::buildRegularUser, "Regular user");
     }
 
     private void initializeUser(String username, Supplier<User> userSupplier, String userType) {

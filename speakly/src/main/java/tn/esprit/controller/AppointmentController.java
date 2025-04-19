@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/appointments")
 public class AppointmentController {
 

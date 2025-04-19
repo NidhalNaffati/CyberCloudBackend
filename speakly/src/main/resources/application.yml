@@ -39,8 +39,12 @@ spring:
 
 # The admin username and password are used to create the admin account when the application starts.
 admin:
-  username: "admin@gmail.com"
+  username: "admin@mail.com"
   password: "admin123"
+
+user:
+  username: "user@mail.com"
+  password: "user123"
 
 jwt:
   expiration:
