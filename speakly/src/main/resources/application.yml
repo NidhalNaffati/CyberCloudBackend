@@ -6,9 +6,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://speakly_db:3306/speakly_db?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/speakly?createDatabaseIfNotExist=true
     username: "root"
-    password: "root"
+    password: ""
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -18,7 +18,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: true
     database-platform: MySQL8Dialect
 
   mail:
@@ -40,8 +39,12 @@ spring:
 
 # The admin username and password are used to create the admin account when the application starts.
 admin:
-  username: "admin@gmail.com"
+  username: "admin@mail.com"
   password: "admin123"
+
+user:
+  username: "user@mail.com"
+  password: "user123"
 
 jwt:
   expiration:

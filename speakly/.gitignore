@@ -33,3 +33,6 @@ build/
 
 ## Environment Variables ##
 .env
+
+## Docker compose files ##
+docker-compose.yaml
