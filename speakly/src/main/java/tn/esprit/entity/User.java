@@ -2,7 +2,6 @@ package tn.esprit.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -73,6 +72,7 @@ public class User {
     private List<Token> tokens;
 
     @JsonBackReference("user-appointments")
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany
+    @JoinColumn(name = "user_id") // Indique la colonne qui contient l'ID utilisateur
     private List<Appointment> appointments;
 }

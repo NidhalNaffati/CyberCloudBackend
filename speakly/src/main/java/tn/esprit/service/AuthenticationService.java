@@ -1,13 +1,6 @@
 package tn.esprit.service;
 
 
-import tn.esprit.entity.User;
-import tn.esprit.entity.VerificationCode;
-import tn.esprit.exception.EmailAlreadyExistsException;
-import tn.esprit.exception.PasswordDontMatchException;
-import tn.esprit.requests.AuthenticationRequest;
-import tn.esprit.requests.AuthenticationResponse;
-import tn.esprit.requests.RegisterRequest;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +12,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import tn.esprit.entity.User;
+import tn.esprit.entity.VerificationCode;
+import tn.esprit.exception.EmailAlreadyExistsException;
+import tn.esprit.exception.PasswordDontMatchException;
+import tn.esprit.requests.AuthenticationRequest;
+import tn.esprit.requests.AuthenticationResponse;
+import tn.esprit.requests.RegisterRequest;
 
 import java.io.IOException;
 

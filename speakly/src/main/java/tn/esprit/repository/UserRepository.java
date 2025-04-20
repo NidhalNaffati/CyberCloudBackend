@@ -1,9 +1,9 @@
 package tn.esprit.repository;
 
-import tn.esprit.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import tn.esprit.entity.User;
 
 import java.util.List;
 import java.util.Optional;

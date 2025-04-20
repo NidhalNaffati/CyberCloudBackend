@@ -1,11 +1,11 @@
 package tn.esprit.requests;
 
 
-import tn.esprit.entity.Role;
-import tn.esprit.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
+import tn.esprit.entity.Role;
+import tn.esprit.entity.User;
 
 
 public record RegisterRequest(

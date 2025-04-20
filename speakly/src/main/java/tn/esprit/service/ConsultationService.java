@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import tn.esprit.entity.Consultation;
 import tn.esprit.repository.ConsultationRepository;
 
-
 import java.util.List;
 import java.util.Optional;
 

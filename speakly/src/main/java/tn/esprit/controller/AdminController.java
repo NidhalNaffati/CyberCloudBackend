@@ -1,10 +1,10 @@
 package tn.esprit.controller;
 
-import tn.esprit.entity.User;
-import tn.esprit.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.entity.User;
+import tn.esprit.service.UserService;
 
 import java.util.List;
 

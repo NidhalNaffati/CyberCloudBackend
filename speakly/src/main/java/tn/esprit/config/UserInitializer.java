@@ -1,7 +1,5 @@
 package tn.esprit.config;
 
-import tn.esprit.entity.User;
-import tn.esprit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +7,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import tn.esprit.entity.User;
+import tn.esprit.repository.UserRepository;
 
 import java.util.function.Supplier;
 
@@ -30,11 +30,9 @@ public class UserInitializer implements ApplicationRunner {
     @Value("${admin.password}")
     private String adminPassword;
 
-    @Value("${user.password}")
-    private String userUsername;
+    private final String USERNAME = "user@mail.com";
 
-    @Value("${user.password}")
-    private String userPassword;
+    private final String USERPASSWORD = "password123";
 
     private User buildAdminUser() {
         return User.builder()
@@ -53,9 +51,9 @@ public class UserInitializer implements ApplicationRunner {
         return User.builder()
             .firstName("User")
             .lastName("Demo")
-            .email(userUsername)
-            .password(userPassword)
-            .confirmPassword(userPassword)
+            .email(USERNAME)
+            .password(USERPASSWORD)
+            .confirmPassword(USERPASSWORD)
             .role(ROLE_USER)
             .enabled(true)
             .accountNonLocked(true)
@@ -65,7 +63,7 @@ public class UserInitializer implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         initializeUser(adminUsername, this::buildAdminUser, "Admin");
-        initializeUser(userUsername, this::buildRegularUser, "Regular user");
+        initializeUser(USERNAME, this::buildRegularUser, "Regular user");
     }
 
     private void initializeUser(String username, Supplier<User> userSupplier, String userType) {

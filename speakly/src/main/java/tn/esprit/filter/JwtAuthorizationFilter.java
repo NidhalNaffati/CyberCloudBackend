@@ -1,9 +1,5 @@
 package tn.esprit.filter;
 
-import tn.esprit.entity.UserDetailsImpl;
-import tn.esprit.service.JwtService;
-import tn.esprit.service.TokenService;
-import tn.esprit.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -21,6 +17,10 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import tn.esprit.entity.UserDetailsImpl;
+import tn.esprit.service.JwtService;
+import tn.esprit.service.TokenService;
+import tn.esprit.service.UserService;
 
 import java.io.IOException;
 import java.util.Enumeration;

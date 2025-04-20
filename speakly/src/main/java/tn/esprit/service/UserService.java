@@ -1,14 +1,6 @@
 package tn.esprit.service;
 
 
-import tn.esprit.entity.User;
-import tn.esprit.exception.AccountLockedException;
-import tn.esprit.exception.EmailAlreadyExistsException;
-import tn.esprit.exception.PasswordDontMatchException;
-import tn.esprit.exception.UserNotFoundException;
-import tn.esprit.entity.UserDetailsImpl;
-import tn.esprit.repository.TokenRepository;
-import tn.esprit.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +9,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import tn.esprit.entity.User;
+import tn.esprit.entity.UserDetailsImpl;
+import tn.esprit.exception.AccountLockedException;
+import tn.esprit.exception.EmailAlreadyExistsException;
+import tn.esprit.exception.PasswordDontMatchException;
+import tn.esprit.exception.UserNotFoundException;
+import tn.esprit.repository.TokenRepository;
+import tn.esprit.repository.UserRepository;
 
 import java.util.List;
 
