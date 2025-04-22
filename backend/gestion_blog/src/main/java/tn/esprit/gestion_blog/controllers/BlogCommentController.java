@@ -9,7 +9,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("blogcomments")
+@RequestMapping("/blogcomments")
 public class BlogCommentController {
 
     private final IBlogCommentService blogCommentService;
@@ -37,5 +37,15 @@ public class BlogCommentController {
     @GetMapping("all")
     public List<BlogComment> getAllComments() {
         return blogCommentService.getAllComments();
+    }
+
+    @GetMapping("/post/{postId}")
+    public List<BlogComment> getCommentsByPostId(@PathVariable Long postId) {
+        return blogCommentService.getCommentsByPostId(postId);
+    }
+    
+    @GetMapping("/user/{userId}")
+    public List<BlogComment> getCommentsByUserId(@PathVariable Long userId) {
+        return blogCommentService.getCommentsByUserId(userId);
     }
 }

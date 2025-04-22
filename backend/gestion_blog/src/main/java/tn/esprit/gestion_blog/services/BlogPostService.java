@@ -45,4 +45,9 @@ public class BlogPostService implements IBlogPostService {
         BlogPost post = getPostById(id);
         blogPostRepository.delete(post);
     }
+    
+    @Override
+    public List<BlogPost> getPostsByUserId(Long userId) {
+        return blogPostRepository.findByUserId(userId);
+    }
 }

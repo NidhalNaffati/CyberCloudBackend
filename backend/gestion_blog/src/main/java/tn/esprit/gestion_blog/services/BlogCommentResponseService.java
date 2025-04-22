@@ -50,4 +50,14 @@ public class BlogCommentResponseService implements IBlogCommentResponseService {
     public void deleteResponse(Long id) {
         blogCommentResponseRepository.deleteById(id);
     }
+    
+    @Override
+    public List<BlogCommentResponse> getResponsesByCommentId(Long commentId) {
+        return blogCommentResponseRepository.findByBlogComment_CommentId(commentId);
+    }
+    
+    @Override
+    public List<BlogCommentResponse> getResponsesByUserId(Long userId) {
+        return blogCommentResponseRepository.findByUserId(userId);
+    }
 }

@@ -1,5 +1,6 @@
 package tn.esprit.gestion_blog.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -26,11 +27,14 @@ public class BlogComment implements Serializable {
     @ManyToOne
     @JoinColumn(name = "postId", nullable = false)
     @ToString.Exclude
+    @com.fasterxml.jackson.annotation.JsonBackReference
     private BlogPost blogPost;
 
     @OneToMany(mappedBy = "blogComment", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
+    @com.fasterxml.jackson.annotation.JsonManagedReference
     private List<BlogCommentResponse> responses;
+
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false, updatable = false)

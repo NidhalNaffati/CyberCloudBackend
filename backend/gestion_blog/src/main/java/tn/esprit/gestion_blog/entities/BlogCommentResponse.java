@@ -25,6 +25,7 @@ public class BlogCommentResponse implements Serializable {
     @ManyToOne
     @JoinColumn(name = "commentId", nullable = false)
     @ToString.Exclude
+    @com.fasterxml.jackson.annotation.JsonBackReference
     private BlogComment blogComment;
 
     @Temporal(TemporalType.TIMESTAMP)

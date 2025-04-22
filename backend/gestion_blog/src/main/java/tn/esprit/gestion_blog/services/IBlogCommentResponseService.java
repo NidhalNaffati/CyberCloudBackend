@@ -10,4 +10,8 @@ public interface IBlogCommentResponseService {
     BlogCommentResponse createResponse(Long commentId, BlogCommentResponse response);  // Modification ici pour prendre en compte commentId
     BlogCommentResponse updateResponse(Long id, BlogCommentResponse updatedResponse);
     void deleteResponse(Long id);
+    
+    // Nouvelles méthodes pour compléter les fonctionnalités CRUD
+    List<BlogCommentResponse> getResponsesByCommentId(Long commentId);
+    List<BlogCommentResponse> getResponsesByUserId(Long userId);
 }

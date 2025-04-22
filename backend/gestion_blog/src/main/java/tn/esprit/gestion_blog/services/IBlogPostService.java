@@ -10,4 +10,7 @@ public interface IBlogPostService {
     BlogPost createPost(BlogPost post);
     BlogPost updatePost(Long id, BlogPost updatedPost);
     void deletePost(Long id);
+    
+    // Nouvelle méthode pour récupérer les posts d'un utilisateur spécifique
+    List<BlogPost> getPostsByUserId(Long userId);
 }

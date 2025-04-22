@@ -1,5 +1,6 @@
 package tn.esprit.gestion_blog.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,6 +16,7 @@ import java.util.List;
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
+
 public class BlogPost implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +31,13 @@ public class BlogPost implements Serializable {
 
     @OneToMany(mappedBy = "blogPost", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
+    @com.fasterxml.jackson.annotation.JsonManagedReference
     private List<BlogComment> comments;
+    
+    @OneToMany(mappedBy = "blogPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @com.fasterxml.jackson.annotation.JsonManagedReference
+    private List<Image> images;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false, updatable = false)

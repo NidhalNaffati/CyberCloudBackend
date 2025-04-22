@@ -13,8 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class BlogCommentService implements IBlogCommentService {
 
-    private  BlogCommentRepository blogCommentRepository;
-    private  BlogPostRepository blogPostRepository;
+    private final BlogCommentRepository blogCommentRepository;
+    private final BlogPostRepository blogPostRepository;
 
     @Override
     public List<BlogComment> getAllComments() {
@@ -27,22 +27,35 @@ public class BlogCommentService implements IBlogCommentService {
     }
 
     @Override
+    public List<BlogComment> getCommentsByPostId(Long postId) {
+        return blogCommentRepository.findByBlogPost_PostId(postId);  // ✅ Correction ici
+    }
+
+    @Override
     public BlogComment createComment(Long postId, BlogComment comment) {
-        BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new RuntimeException("BlogPost not found"));
+        BlogPost blogPost = blogPostRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("BlogPost not found"));
         comment.setBlogPost(blogPost);  // Lier le commentaire au BlogPost
         return blogCommentRepository.save(comment);
     }
 
     @Override
     public BlogComment updateComment(Long id, BlogComment updatedComment) {
-        BlogComment existingComment = blogCommentRepository.findById(id).orElseThrow(() -> new RuntimeException("Comment not found"));
-        existingComment.setContent(updatedComment.getContent());  // Mise à jour du contenu du commentaire
+        BlogComment existingComment = blogCommentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        existingComment.setContent(updatedComment.getContent());
         return blogCommentRepository.save(existingComment);
     }
 
     @Override
     public void deleteComment(Long id) {
-        BlogComment comment = blogCommentRepository.findById(id).orElseThrow(() -> new RuntimeException("Comment not found"));
+        BlogComment comment = blogCommentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
         blogCommentRepository.delete(comment);
+    }
+    
+    @Override
+    public List<BlogComment> getCommentsByUserId(Long userId) {
+        return blogCommentRepository.findByUserId(userId);
     }
 }

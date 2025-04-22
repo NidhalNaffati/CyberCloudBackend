@@ -38,4 +38,14 @@ public class BlogCommentResponseController {
     public List<BlogCommentResponse> getAllResponses() {
         return blogCommentResponseService.getAllResponses();
     }
+    
+    @GetMapping("comment/{commentId}")
+    public List<BlogCommentResponse> getResponsesByCommentId(@PathVariable Long commentId) {
+        return blogCommentResponseService.getResponsesByCommentId(commentId);
+    }
+    
+    @GetMapping("user/{userId}")
+    public List<BlogCommentResponse> getResponsesByUserId(@PathVariable Long userId) {
+        return blogCommentResponseService.getResponsesByUserId(userId);
+    }
 }
