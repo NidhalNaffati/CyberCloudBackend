@@ -82,6 +82,12 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
+    private List<Complaint> complaints;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<ResponseComplaint> responseComplaints;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<BlogComment> blogComments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

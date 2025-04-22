@@ -7,6 +7,7 @@ import tn.esprit.entity.BlogPost;
 import tn.esprit.entity.Reaction;
 import tn.esprit.repository.BlogCommentRepository;
 import tn.esprit.repository.BlogPostRepository;
+import tn.esprit.repository.IStatisticsRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -17,7 +18,8 @@ public class StatisticsService implements IStatisticsService {
 
     @Autowired
     private BlogPostRepository blogPostRepository;
-
+    @Autowired
+    private IStatisticsRepository statisticsRepository;
     @Autowired
     private BlogCommentRepository blogCommentRepository;
 
@@ -380,5 +382,51 @@ public class StatisticsService implements IStatisticsService {
 
         return result;
     }
+
+
+    public Map<String, Long> getComplaintStatistics() {
+        Map<String, Long> stats = new HashMap<>();
+
+        // Read/Unread statistics
+        stats.put("readComplaints", statisticsRepository.countByReadStatus(true));
+        stats.put("unreadComplaints", statisticsRepository.countByReadStatus(false));
+
+        // Urgent/Normal statistics
+        stats.put("urgentComplaints", statisticsRepository.countByUrgencyStatus(true));
+        stats.put("normalComplaints", statisticsRepository.countByUrgencyStatus(false));
+
+        // Rating statistics
+        for (int i = 0; i <= 5; i++) {
+            stats.put("rating" + i, statisticsRepository.countByRating(i));
+        }
+
+        // Total complaints
+        stats.put("totalComplaints", statisticsRepository.countAllComplaints());
+
+        return stats;
+    }
+
+    public Map<Integer, Long> getRatingDistribution() {
+        Map<Integer, Long> ratingStats = new HashMap<>();
+        for (int i = 0; i <= 5; i++) {
+            ratingStats.put(i, statisticsRepository.countByRating(i));
+        }
+        return ratingStats;
+    }
+
+    public Map<String, Long> getStatusStatistics() {
+        Map<String, Long> statusStats = new HashMap<>();
+        statusStats.put("read", statisticsRepository.countByReadStatus(true));
+        statusStats.put("unread", statisticsRepository.countByReadStatus(false));
+        return statusStats;
+    }
+
+    public Map<String, Long> getUrgencyStatistics() {
+        Map<String, Long> urgencyStats = new HashMap<>();
+        urgencyStats.put("urgent", statisticsRepository.countByUrgencyStatus(true));
+        urgencyStats.put("normal", statisticsRepository.countByUrgencyStatus(false));
+        return urgencyStats;
+    }
+
 
 }
