@@ -75,4 +75,19 @@ public class User {
     @JsonBackReference("user-appointments")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Appointment> appointments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+   @JsonIgnore
+    private List<BlogPost> blogPosts;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<BlogComment> blogComments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<BlogCommentResponse> blogCommentResponses;
+
+
+
 }

@@ -24,7 +24,7 @@ public class Appointment {
 
     // Utilisation de Long pour l'id de l'utilisateur pour cohérence avec les autres entités
 
-    @JsonManagedReference("user-appointments")
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
