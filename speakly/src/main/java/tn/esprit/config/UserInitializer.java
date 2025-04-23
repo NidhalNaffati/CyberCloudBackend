@@ -30,7 +30,7 @@ public class UserInitializer implements ApplicationRunner {
     @Value("${admin.password}")
     private String adminPassword;
 
-    @Value("${user.password}")
+    @Value("${user.username}")
     private String userUsername;
 
     @Value("${user.password}")
