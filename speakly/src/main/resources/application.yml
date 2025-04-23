@@ -2,7 +2,8 @@ application:
   name: speakly
 
 server:
-  port: 8089
+  port: 8080
+
 logging:
   level:
     org:
@@ -42,8 +43,8 @@ spring:
 
 # The admin username and password are used to create the admin account when the application starts.
 admin:
-  username: "admin@mail.com"
-  password: "admin123"
+  username: "nidhalnaffati@gmail.com"
+  password: "nidhal123"
 
 user:
   username: "user@mail.com"
