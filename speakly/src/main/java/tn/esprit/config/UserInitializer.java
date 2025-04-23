@@ -46,6 +46,7 @@ public class UserInitializer implements ApplicationRunner {
             .role(ROLE_ADMIN)
             .enabled(true)
             .accountNonLocked(true)
+            .documentsVerified(true)
             .build();
     }
 

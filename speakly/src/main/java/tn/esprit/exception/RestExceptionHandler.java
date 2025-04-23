@@ -127,6 +127,30 @@ public class RestExceptionHandler {
         return buildResponseEntity(response);
     }
 
+    @ExceptionHandler(AccountNotVerifiedException.class)
+    public ResponseEntity<Object> handleAccountNotVerifiedException(AccountNotVerifiedException exception) {
+        ErrorResponse response = new ErrorResponse();
+        response.setStatus(BAD_REQUEST);
+        response.setMessage(exception.getReason());
+        return buildResponseEntity(response);
+    }
+
+    @ExceptionHandler(DocumentNotFoundException.class)
+    public ResponseEntity<Object> handleDocumentNotFoundException(DocumentNotFoundException exception) {
+        ErrorResponse response = new ErrorResponse();
+        response.setStatus(BAD_REQUEST);
+        response.setMessage(exception.getReason());
+        return buildResponseEntity(response);
+    }
+
+    @ExceptionHandler(InvalidDocumentException.class)
+    public ResponseEntity<Object> handleInvalidDocumentException(InvalidDocumentException exception) {
+        ErrorResponse response = new ErrorResponse();
+        response.setStatus(BAD_REQUEST);
+        response.setMessage(exception.getReason());
+        return buildResponseEntity(response);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleHttpMessageNotReadable() {
         ErrorResponse response = new ErrorResponse();

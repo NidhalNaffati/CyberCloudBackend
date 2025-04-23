@@ -2,7 +2,6 @@ package tn.esprit.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -72,12 +71,17 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
+    private Boolean documentsVerified = false;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private MedecinDocument document;
+
     @JsonBackReference("user-appointments")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Appointment> appointments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-   @JsonIgnore
+    @JsonIgnore
     private List<BlogPost> blogPosts;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -93,7 +97,5 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<BlogCommentResponse> blogCommentResponses;
-
-
 
 }
