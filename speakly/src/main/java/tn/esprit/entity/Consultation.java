@@ -1,11 +1,17 @@
 package tn.esprit.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
 
 @Entity
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Consultation {
 
     @Id
@@ -15,8 +21,7 @@ public class Consultation {
     private String details;
     private String description;
     private LocalTime actualDuration;
-
-    @JsonBackReference("appointment-consultations")
+  //  @JsonBackReference("appointment-consultations")
     @ManyToOne
     @JoinColumn(name = "appointment_id")
     private Appointment appointment;

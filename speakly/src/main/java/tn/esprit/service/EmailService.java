@@ -184,5 +184,38 @@ public class EmailService {
             log.error("Failed to send email to {}", email, exception);
         }
     }
+    public void sendAppointmentConfirmation(String email, String firstName, String appointmentDate, String startTime, String endTime) {
+        String template = "templates/appointment-confirmation.html";
+        String subject = "Your Appointment is Confirmed";
+        String senderName = "Appointment Team";
+        String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(senderEmail, senderName);
+            helper.setTo(email);
+            helper.setSubject(subject);
+
+            // Load and process template
+            ClassPathResource resource = new ClassPathResource(template);
+            String content = new String(Files.readAllBytes(resource.getFile().toPath()));
+
+            content = content.replace("{{firstName}}", firstName);
+            content = content.replace("{{appointmentDate}}", appointmentDate);
+            content = content.replace("{{startTime}}", startTime);
+            content = content.replace("{{endTime}}", endTime);
+            content = content.replace("{{currentYear}}", currentYear);
+
+            helper.setText(content, true);
+            javaMailSender.send(message);
+
+            log.info("Appointment confirmation sent to {}", email);
+        } catch (MessagingException | IOException e) {
+            log.error("Error sending appointment confirmation to {}", email, e);
+        }
+    }
+
 
 }
