@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import tn.esprit.dto.MedecinDocumentDto;
 import tn.esprit.entity.MedecinDocument;
 import tn.esprit.entity.Role;
 import tn.esprit.entity.User;
@@ -14,7 +15,9 @@ import tn.esprit.repository.MedecinDocumentRepository;
 import tn.esprit.repository.UserRepository;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,7 +28,7 @@ public class MedecinDocumentService {
     private final MedecinDocumentRepository medecinDocumentRepository;
     private final EmailService emailService;
 
-        @Transactional
+    @Transactional
     public void uploadMedecinDocuments(String email, MultipartFile file) {
         log.info("Trying to upload document for user with email: {})", email);
 
@@ -38,6 +41,10 @@ public class MedecinDocumentService {
         }
 
         try {
+            // Check if user already has a document and delete it if they do
+            Optional<MedecinDocument> existingDocument = medecinDocumentRepository.findByUserId(user.getId());
+            existingDocument.ifPresent(medecinDocumentRepository::delete);
+
             // Create document entity
             MedecinDocument document = MedecinDocument.builder()
                 .documentData(file.getBytes())
@@ -61,63 +68,25 @@ public class MedecinDocumentService {
         }
     }
 
-    /**
-     * Verifies the documents of a medecin user by admin
-     *
-     * @param email    The email of the medecin
-     * @param approved Whether the documents are approved
-     */
-    @Transactional
-    public void verifyMedecinDocuments(String email, boolean approved) {
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
+    public MedecinDocumentDto getMedecinDocumentByUserId(Long userId) {
+        Optional<MedecinDocument> documentOpt = medecinDocumentRepository.findByUserId(userId);
 
-        // Check if the user is a medecin
-        if (user.getRole() != Role.ROLE_MEDECIN) {
-            throw new IllegalStateException("User is not registered as a medecin");
+        if (documentOpt.isPresent()) {
+            MedecinDocument document = documentOpt.get();
+            User user = document.getUser();
+
+            return MedecinDocumentDto.builder()
+                .id(document.getId())
+                .documentName(document.getDocumentName())
+                .documentType(document.getDocumentType())
+                .documentSize(document.getDocumentSize())
+                .documentData(Base64.getEncoder().encodeToString(document.getDocumentData()))
+                .uploadDate(document.getUploadDate())
+                .userDocumentsVerified(user.getDocumentsVerified())
+                .build();
         }
 
-        user.setDocumentsVerified(approved);
-
-        // If documents are approved, enable the account
-        if (approved) {
-            user.setEnabled(true);
-            // Notify user that their account is now active
-            emailService.sendDocumentVerificationSuccessful(
-                user.getEmail(),
-                user.getFirstName()
-            );
-        } else {
-            // Notify user that their documents were rejected
-            emailService.sendDocumentVerificationRejected(
-                user.getEmail(),
-                user.getFirstName()
-            );
-        }
-
-        userRepository.save(user);
-    }
-
-    /**
-     * Gets all medecin users with pending document verification
-     *
-     * @return List of users with pending verification
-     */
-    public List<User> getMedecinsWithPendingVerification() {
-        return userRepository.findAllMedecinsWithPendingVerification();
-    }
-
-    /**
-     * Gets all documents for a specific medecin
-     *
-     * @param email The email of the medecin
-     * @return List of documents
-     */
-    public List<MedecinDocument> getMedecinDocuments(String email) {
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
-
-        return medecinDocumentRepository.findByUser(user);
+        return null;
     }
 
     private void notifyAdminAboutNewSubmission(User user) {

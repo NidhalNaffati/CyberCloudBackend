@@ -1,5 +1,6 @@
 package tn.esprit.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,8 +31,9 @@ public class MedecinDocument {
     @Column(name = "document_size")
     private Long documentSize;
 
-    @OneToOne  // Changed from @ManyToOne to @OneToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     @Column(name = "upload_date")

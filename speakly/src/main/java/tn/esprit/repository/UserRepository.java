@@ -32,10 +32,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.role = 'ROLE_USER' AND u.accountNonLocked = TRUE")
     List<User> findUnlockedUsers();
 
-    @Query("SELECT u FROM User u WHERE u.role = 'ROLE_MEDECIN' AND (u.documentsVerified = false OR u.documentsVerified IS NULL)")
-    List<User> findAllMedecinsWithPendingVerification();
-
     @Query("SELECT u.email FROM User u WHERE u.role = :role")
     List<String> findEmailsByRole(@Param("role") Role role);
+
+    @Query("SELECT u FROM User u WHERE u.role = :role")
+    List<User> findUsersByRole(Role role);
 
 }

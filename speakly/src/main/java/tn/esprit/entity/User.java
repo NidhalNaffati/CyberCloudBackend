@@ -2,6 +2,7 @@ package tn.esprit.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -74,6 +75,7 @@ public class User {
     private Boolean documentsVerified = false;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private MedecinDocument document;
 
     @JsonBackReference("user-appointments")
