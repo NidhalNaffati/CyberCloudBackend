@@ -383,6 +383,34 @@ public class StatisticsService implements IStatisticsService {
         return result;
     }
 
+    @Override
+    public Map<String, Object> getActivityStatistics() {
+        Map<String, Object> statistics = new HashMap<>();
+        statistics.put("fullActivities", statisticsRepository.countFullActivities());
+        statistics.put("availableActivities", statisticsRepository.countAvailableActivities());
+        statistics.put("averagePrice", statisticsRepository.getAverageActivityPrice());
+        return statistics;
+    }
+
+
+    @Override
+    public List<Object[]> getLocationStatistics() {
+        return statisticsRepository.countActivitiesByLocation();
+    }
+
+    @Override
+    public List<Object[]> getMonthlyActivityStatistics() {
+        return statisticsRepository.countActivitiesByMonth();
+    }
+
+    @Override
+    public Map<String, Long> getActivityMetrics(Long activityId) {
+        Map<String, Long> metrics = new HashMap<>();
+        metrics.put("waitlistCount", statisticsRepository.countWaitlistByActivity(activityId));
+        metrics.put("reservationsCount", statisticsRepository.countReservationsByActivity(activityId));
+        return metrics;
+    }
+
 
     public Map<String, Long> getComplaintStatistics() {
         Map<String, Long> stats = new HashMap<>();

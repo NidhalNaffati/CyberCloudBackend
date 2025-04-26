@@ -18,10 +18,10 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(
-    name = "user_app",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = "email")
-    })
+        name = "user_app",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "email")
+        })
 public class User {
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -77,7 +77,7 @@ public class User {
     private List<Appointment> appointments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-   @JsonIgnore
+    @JsonIgnore
     private List<BlogPost> blogPosts;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

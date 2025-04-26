@@ -79,6 +79,7 @@ public class SecurityConfig {
 
                 // allow only authenticated user to this endpoint
                 .requestMatchers("/api/v1/user/**").hasAuthority("ROLE_USER")
+                    .requestMatchers("/statistics/**").authenticated()
 
                 // allow only authenticated admin to this endpoint
                 .requestMatchers("/api/v1/admin/**").hasAuthority("ROLE_ADMIN")

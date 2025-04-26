@@ -8,6 +8,7 @@ import tn.esprit.entity.WaitlistRegistration;
 import tn.esprit.exception.ResourceNotFoundException;
 import tn.esprit.repository.WaitlistRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 // WaitlistService.java
@@ -17,8 +18,8 @@ public class WaitlistService {
 
 
     private final ActivityServiceImpl activityService;
-   private final WaitlistRepository waitlistRepository;
-   private final EmailService emailService;
+    private final WaitlistRepository waitlistRepository;
+    private final EmailService emailService;
     public WaitlistService(@Lazy ActivityServiceImpl activityService, WaitlistRepository waitlistRepository, EmailService emailService) {
         this.activityService = activityService;
         this.waitlistRepository = waitlistRepository;
@@ -53,5 +54,30 @@ public class WaitlistService {
         );
 
         emailService.sendSimpleEmail(registration.getEmail(), subject, message);
+    }
+    public boolean isUserInWaitlist(Long activityId, String userEmail) {
+        Activity activity = activityService.getActivityById(activityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
+
+        return waitlistRepository.existsByActivityAndEmail(activity, userEmail);
+    }
+
+    @Transactional
+    public WaitlistRegistration addToWaitlist(Long activityId, String userEmail) {
+        // Check if user is already in waitlist
+        if (isUserInWaitlist(activityId, userEmail)) {
+            throw new IllegalStateException("User is already in the waitlist for this activity");
+        }
+
+        Activity activity = activityService.getActivityById(activityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
+
+        WaitlistRegistration registration = new WaitlistRegistration();
+        registration.setActivity(activity);
+        registration.setEmail(userEmail);
+        registration.setRegistrationDate(LocalDateTime.now());
+        registration.setNotified(false);
+
+        return waitlistRepository.save(registration);
     }
 }

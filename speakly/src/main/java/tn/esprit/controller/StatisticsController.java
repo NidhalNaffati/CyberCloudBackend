@@ -3,6 +3,7 @@ package tn.esprit.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.service.IStatisticsService;
 
@@ -122,5 +123,26 @@ public class StatisticsController {
     @GetMapping("users/activity")
     public Map<Long, Map<String, Integer>> getUsersActivity(@RequestParam(defaultValue = "10") int limit) {
         return statisticsService.getUsersActivity(limit);
+    }
+
+    @GetMapping("activities/general")
+    public ResponseEntity<Map<String, Object>> getActivityStatistics() {
+        return ResponseEntity.ok(statisticsService.getActivityStatistics());
+    }
+
+    @GetMapping("activities/locations")
+    public ResponseEntity<Object> getLocationStatistics() {
+        return ResponseEntity.ok(statisticsService.getLocationStatistics());
+    }
+
+    @GetMapping("activities/monthly")
+    public ResponseEntity<Object> getMonthlyActivityStatistics() {
+        return ResponseEntity.ok(statisticsService.getMonthlyActivityStatistics());
+    }
+
+    @GetMapping("activities/{activityId}/metrics")
+    public ResponseEntity<Map<String, Long>> getActivityMetrics(
+            @PathVariable Long activityId) {
+        return ResponseEntity.ok(statisticsService.getActivityMetrics(activityId));
     }
 }
