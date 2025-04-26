@@ -21,6 +21,12 @@ public class AdminController {
     private final UserService userService;
     private final MedecinDocumentService medecinDocumentService;
 
+    @GetMapping("/fullname")
+    public ResponseEntity<String> getAdminFullName(@RequestParam long id) {
+        String fullName = userService.getAdminFullName(id);
+        return ResponseEntity.ok(fullName);
+    }
+
     @GetMapping("/medecins")
     public ResponseEntity<List<MedecinDto>> getAllMedecins() {
         log.info("Getting all medecins");
