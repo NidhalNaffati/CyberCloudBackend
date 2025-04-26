@@ -80,4 +80,10 @@ public interface IStatisticsService {
     Object getMonthlyActivityStatistics();
 
     Map<String, Long> getActivityMetrics(Long activityId);
+
+    Map<Integer, Long> getRatingDistribution();
+    Map<String, Long> getStatusStatistics();
+    Map<String, Long> getUrgencyStatistics();
+    long getTotalComplaintsCount();
+
 }

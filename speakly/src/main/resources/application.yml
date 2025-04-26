@@ -49,6 +49,13 @@ user:
   username: "user@mail.com"
   password: "user123"
 
+
+badwords:
+  api:
+    url: https://openrouter.ai/api/v1/chat/completions
+    key: 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
+
+
 jwt:
   expiration:
     access-token: 86400000          # 1 hour
