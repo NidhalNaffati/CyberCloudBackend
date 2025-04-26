@@ -12,6 +12,7 @@ import org.springframework.mail.MailSendException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.entity.User;
@@ -20,6 +21,7 @@ import tn.esprit.exception.EmailAlreadyExistsException;
 import tn.esprit.exception.PasswordDontMatchException;
 import tn.esprit.requests.AuthenticationRequest;
 import tn.esprit.requests.AuthenticationResponse;
+import tn.esprit.requests.EditProfileRequest;
 import tn.esprit.requests.RegisterRequest;
 
 import java.io.IOException;
@@ -286,5 +288,46 @@ public class AuthenticationService {
             }
         }
         return result;
+    }
+
+    public User getCurrentUser() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User not authenticated");
+        }
+        String email = authentication.getName();
+        return userService.findUserByEmail(email);
+    }
+
+    @Transactional
+    public void updateUserProfile(EditProfileRequest request) {
+        User user = getCurrentUser();
+        String currentEmail = user.getEmail();
+
+        // Check if email is being changed
+        if (!currentEmail.equals(request.email())) {
+            // Check if the new email belongs to another user
+            if (userService.emailExistsForAnotherUser(request.email(), currentEmail)) {
+                log.error("Email {} already exists for another user", request.email());
+                throw new EmailAlreadyExistsException();
+            }
+            // Update the email if new is different and doesn't exist for another user
+            user.setEmail(request.email());
+        }
+
+        // Validate password if provided
+        if (request.password() != null && !request.password().isEmpty()) {
+            if (!request.password().equals(request.confirmPassword())) {
+                log.error("Password and confirm password do not match");
+                throw new PasswordDontMatchException();
+            }
+            userService.updatePassword(currentEmail, request.password(), request.confirmPassword());
+        }
+
+        // Update user fields
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+
+        log.info("User profile updated for email {}", user.getEmail());
     }
 }

@@ -78,6 +78,13 @@ public class UserService implements UserDetailsService {
             .orElseThrow(() -> new UserNotFoundException("no user with email: " + email + " found"));
     }
 
+    public boolean emailExistsForAnotherUser(String email, String currentEmail) {
+        if (email.equals(currentEmail)) {
+            return false; // Same email, so it doesn't exist for another user
+        }
+        return emailExists(email);
+    }
+
     /**
      * Saves a new user account to the database, after checking that no other account with the same email address exists.
      *
