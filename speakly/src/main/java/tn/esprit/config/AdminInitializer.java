@@ -31,8 +31,8 @@ public class AdminInitializer implements ApplicationRunner {
 
     private User buildAdminUser() {
         return User.builder()
-            .firstName("admin")
-            .lastName("admin")
+            .firstName("John")
+            .lastName("Naffati")
             .email(adminUsername)
             .password(adminPassword)
             .confirmPassword(adminPassword)
