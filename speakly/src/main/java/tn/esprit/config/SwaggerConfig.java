@@ -21,9 +21,9 @@ import org.springframework.context.annotation.Configuration;
 )
 @OpenAPIDefinition(
     info = @io.swagger.v3.oas.annotations.info.Info(
-        title = "Spring Boot JWT Authentication API",
+        title = "Speakly API",
         version = "1.0",
-        description = "A simple Spring Boot JWT Authentication API"
+        description = "Speakly API"
     ),
     security = {
         @SecurityRequirement(name = "bearerAuth")
@@ -37,8 +37,8 @@ public class SwaggerConfig {
         return new OpenAPI()
             .components(new Components())
             .info(new Info()
-                .title("Spring Boot JWT Authentication API")
+                .title("Speakly API")
                 .version("1.0")
-                .description("A simple Spring Boot JWT Authentication API"));
+                .description("Speakly API"));
     }
 }

@@ -65,7 +65,7 @@ public class SecurityConfig {
             // set up the authorization rules
             .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                 // allow access to the static resources to everyone
-                .requestMatchers("/api/v1/auth/register", "/api/v1/auth/refresh-token",
+                .requestMatchers("/api/v1/auth/register/**", "/api/v1/auth/refresh-token",
                     "/api/v1/auth/verify-user", "/api/v1/auth/authenticate",
                     "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password",
                     // swagger endpoints
@@ -74,19 +74,13 @@ public class SecurityConfig {
                     "/configuration/ui", "/configuration/security",
                     "/swagger-ui/**", "/webjars/**", "/swagger-ui.html"
 
-
                 ).permitAll()
 
                 // allow only authenticated user to this endpoint
                 .requestMatchers("/api/v1/user/**").hasAuthority("ROLE_USER")
-                    .requestMatchers("/statistics/**").authenticated()
 
                 // allow only authenticated admin to this endpoint
                 .requestMatchers("/api/v1/admin/**").hasAuthority("ROLE_ADMIN")
-                    .requestMatchers("/activities/add", "/activities/list").permitAll()
-                    .requestMatchers("/activities/**").authenticated()
-// 👈 Autorisation requise pour toute activité
-                    .requestMatchers("/reservations/**").authenticated() //
 
                 // any other request must be authenticated
                 .anyRequest().authenticated())
