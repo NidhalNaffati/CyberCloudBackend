@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.entity.Complaint;
 import tn.esprit.entity.ResponseComplaint;
+import tn.esprit.service.BadWordsService;
 import tn.esprit.service.ResponseComplaintService;
 
 import java.util.List;
@@ -20,17 +21,36 @@ public class ResponseComplaintController {
     @Autowired
     private ResponseComplaintService responseService;
 
-    @Operation(summary = "Add a response to a complaint", description = "Allows adding a response to an existing complaint.")
+    @Autowired
+    private BadWordsService badWordsService;
+
+    @Operation(summary = "Add a response to a complaint", description = "Allows adding a response to an existing complaint. Checks for inappropriate content.")
     @PostMapping(value="/{complaintId}/{user_id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseComplaint addResponse(@PathVariable int complaintId, @RequestBody ResponseComplaint response,@PathVariable Long user_id) throws Exception {
+    public ResponseEntity<?> addResponse(@PathVariable int complaintId, @RequestBody ResponseComplaint response, @PathVariable Long user_id) throws Exception {
+        // Check for bad words in the response content
+        String contentCheck = badWordsService.checkForBadWords(response.getContent());
+
+        if ("YES".equalsIgnoreCase(contentCheck)) {
+            return ResponseEntity.badRequest().body("Your response contains inappropriate content and cannot be submitted.");
+        }
+
         System.out.println(response);
-        return responseService.addResponse(complaintId, response ,user_id);
+        ResponseComplaint savedResponse = responseService.addResponse(complaintId, response, user_id);
+        return ResponseEntity.ok(savedResponse);
     }
 
-    @Operation(summary = "Update a response", description = "Allows updating an existing response by its ID.")
+    @Operation(summary = "Update a response", description = "Allows updating an existing response by its ID. Checks for inappropriate content.")
     @PutMapping("/{responseId}")
-    public ResponseComplaint updateResponse(@PathVariable int responseId, @RequestBody ResponseComplaint response) {
-        return responseService.updateResponse(responseId, response);
+    public ResponseEntity<?> updateResponse(@PathVariable int responseId, @RequestBody ResponseComplaint response) {
+        // Check for bad words in the updated content
+        String contentCheck = badWordsService.checkForBadWords(response.getContent());
+
+        if ("YES".equalsIgnoreCase(contentCheck)) {
+            return ResponseEntity.badRequest().body("Your response contains inappropriate content and cannot be updated.");
+        }
+
+        ResponseComplaint updatedResponse = responseService.updateResponse(responseId, response);
+        return ResponseEntity.ok(updatedResponse);
     }
 
     @Operation(summary = "Delete a response", description = "Allows deleting an existing response by its ID.")

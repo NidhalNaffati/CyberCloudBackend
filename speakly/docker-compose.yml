@@ -1,0 +1,15 @@
+services:
+  # MySQL Database
+  mysql_db:
+    image: mysql:8
+    container_name: speakly_db
+    environment:
+      MYSQL_DATABASE: speakly_db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

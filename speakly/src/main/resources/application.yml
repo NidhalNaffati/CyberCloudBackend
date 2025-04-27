@@ -2,7 +2,8 @@ application:
   name: speakly
 
 server:
-  port: 8089
+  port: 8080
+
 logging:
   level:
     org:
@@ -42,12 +43,19 @@ spring:
 
 # The admin username and password are used to create the admin account when the application starts.
 admin:
-  username: "admin@mail.com"
-  password: "admin123"
+  username: "nidhalnaffati@gmail.com"
+  password: "nidhal123"
 
 user:
   username: "user@mail.com"
   password: "user123"
+
+
+badwords:
+  api:
+    url: https://openrouter.ai/api/v1/chat/completions
+    key: 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
+
 
 jwt:
   expiration:

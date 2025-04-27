@@ -72,12 +72,18 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
+    private Boolean documentsVerified = false;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private MedecinDocument document;
+
     @JsonBackReference("user-appointments")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Appointment> appointments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-   @JsonIgnore
+    @JsonIgnore
     private List<BlogPost> blogPosts;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -93,7 +99,5 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<BlogCommentResponse> blogCommentResponses;
-
-
 
 }

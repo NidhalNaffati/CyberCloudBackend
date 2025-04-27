@@ -72,4 +72,18 @@ public interface IStatisticsService {
      * @return Map avec les IDs des utilisateurs comme clés et leur activité comme valeurs
      */
     Map<Long, Map<String, Integer>> getUsersActivity(int limit);
+
+    Map<String, Object> getActivityStatistics();
+
+    Object getLocationStatistics();
+
+    Object getMonthlyActivityStatistics();
+
+    Map<String, Long> getActivityMetrics(Long activityId);
+
+    Map<Integer, Long> getRatingDistribution();
+    Map<String, Long> getStatusStatistics();
+    Map<String, Long> getUrgencyStatistics();
+    long getTotalComplaintsCount();
+
 }

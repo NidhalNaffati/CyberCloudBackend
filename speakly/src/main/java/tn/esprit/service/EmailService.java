@@ -98,11 +98,12 @@ public class EmailService {
         sendEmailWithVerificationCode(email, firstName, subject, code, template, resetPasswordCodeExpirationTimeInMinutes);
     }
 
-    private void sendEmailWithVerificationCode(String email, String firstName, String subject, String code,
-                                               String template, int expirationMinutes) {
+    private void sendEmailWithVerificationCode(
+        String email, String firstName, String subject, String code,
+        String template, int expirationMinutes) {
 
         String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
-        String senderName = "Spring Boot 3 Team";
+        String senderName = "Speakly Team";
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -116,9 +117,9 @@ public class EmailService {
             String content = new String(Files.readAllBytes(resource.getFile().toPath()));
 
             content = content.replace("{{firstName}}", firstName)
-                    .replace("{{verificationCode}}", code)
-                    .replace("{{currentYear}}", currentYear)
-                    .replace("{{expirationTimeInMinutes}}", String.valueOf(expirationMinutes));
+                .replace("{{verificationCode}}", code)
+                .replace("{{currentYear}}", currentYear)
+                .replace("{{expirationTimeInMinutes}}", String.valueOf(expirationMinutes));
 
             helper.setText(content, true);
             mailSender.send(message);
@@ -130,25 +131,48 @@ public class EmailService {
         }
     }
 
-    // ========== Link-Based Emails ==========
-    public void sendActivationLink(String email, String firstName, String activationLink) {
-        String template = "templates/activate-account.html";
-        String subject = "Activate Your Account";
-        sendEmailWithTemplate(email, firstName, subject, activationLink, template, enableAccountExpirationTimeInMs);
-    }
-
     public void sendResetPasswordRequestToUser(String email, String firstName, String resetPasswordLink) {
         String template = "templates/reset-password.html";
         String subject = "Reset Your Password";
         sendEmailWithTemplate(email, firstName, subject, resetPasswordLink, template, resetPasswordExpirationTimeInMs);
     }
 
-    private void sendEmailWithTemplate(String email, String firstName, String subject, String url,
-                                       String template, long expirationTimeInMs) {
+    public void sendDocumentVerificationSuccessful(String email, String firstName) {
+        String TEMPLATE = "templates/document-verification-success.html";
+        String subject = "Document Verified Successfully";
+
+        sendGenericEmail(email, firstName, subject, TEMPLATE, "accepted");
+    }
+
+    public void sendDocumentVerificationRejected(String email, String firstName) {
+        String TEMPLATE = "templates/document-verification-rejected.html";
+        String subject = "Document Verification Rejected";
+
+        sendGenericEmail(email, firstName, subject, TEMPLATE, "rejected");
+    }
+
+    public void sendNewMedecinDocumentSubmissionNotification(String email, String firstName) {
+        String TEMPLATE = "templates/new-document-submission.html";
+        String subject = "New Document Submitted by Medecin";
+
+        sendGenericEmail(email, firstName, subject, TEMPLATE, "submitted");
+    }
+
+    public void sendDocumentSubmissionWaitingApproval(String email, String firstName) {
+        String TEMPLATE = "templates/document-submission-waiting.html";
+        String subject = "Document Submission Received";
+
+        sendGenericEmail(email, firstName, subject, TEMPLATE, "waiting");
+    }
+
+
+    private void sendEmailWithTemplate(
+        String email, String firstName, String subject, String url,
+        String template, long expirationTimeInMs) {
 
         String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
         int expirationTimeInMinutes = (int) (expirationTimeInMs / 60000);
-        String senderName = "Spring Boot 3 Team";
+        String senderName = "Speakly Team";
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -162,9 +186,9 @@ public class EmailService {
             String content = new String(Files.readAllBytes(resource.getFile().toPath()));
 
             content = content.replace("{{firstName}}", firstName)
-                    .replace("{{activationLink}}", url)
-                    .replace("{{currentYear}}", currentYear)
-                    .replace("{{expirationTimeInMinutes}}", String.valueOf(expirationTimeInMinutes));
+                .replace("{{activationLink}}", url)
+                .replace("{{currentYear}}", currentYear)
+                .replace("{{expirationTimeInMinutes}}", String.valueOf(expirationTimeInMinutes));
 
             helper.setText(content, true);
             mailSender.send(message);
@@ -220,5 +244,38 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
+
+    private void sendGenericEmail(String email, String firstName, String subject, String template, String status) {
+        String senderName = "Speakly Team";
+        String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail, senderName);
+            helper.setTo(email);
+            helper.setSubject(subject);
+
+            // Load email template from file
+            ClassPathResource resource = new ClassPathResource(template);
+            String content = new String(Files.readAllBytes(resource.getFile().toPath()));
+
+            // Replace placeholders in email template
+            content = content.replace("{{firstName}}", firstName);
+            content = content.replace("{{status}}", status);
+            content = content.replace("{{currentYear}}", currentYear);
+
+            helper.setText(content, true);
+
+            mailSender.send(message);
+            log.info("{} email sent to {}", status, email);
+
+        } catch (MessagingException | IOException e) {
+            log.error("Failed to send {} email to {}", status, email, e);
+        }
+    }
+
 
 }

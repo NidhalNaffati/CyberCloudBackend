@@ -1,22 +1,19 @@
 package tn.esprit.requests;
 
 
-import tn.esprit.entity.Role;
-import tn.esprit.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
+import tn.esprit.entity.Role;
+import tn.esprit.entity.User;
 
 
 public record RegisterRequest(
-    @Length(min = 3, max = 16,
-        message = "first name length should be less than 16 and more than 3 ")
+    @Length(min = 3, max = 16, message = "first name length should be less than 16 and more than 3 ")
     String firstName,
 
-    @Length(min = 3, max = 16,
-        message = "last name length should be less than 16 and more than 3 ")
+    @Length(min = 3, max = 16, message = "last name length should be less than 16 and more than 3 ")
     String lastName,
-
 
     @Email(message = "Email should be valid")
     @NotNull(message = "Email shouldn't be null")
@@ -39,10 +36,27 @@ public record RegisterRequest(
             .email(email)
             .password(password)
             .confirmPassword(confirmPassword)
-            .role(role)
+            .role(Role.ROLE_USER)
             .accountNonLocked(true)
             .enabled(false)
             .failedAttempts(0)
+            .document(null)
+            .documentsVerified(true)
+            .build();
+    }
+
+    public User toMedecin() {
+        return User.builder()
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .password(password)
+            .confirmPassword(confirmPassword)
+            .role(Role.ROLE_MEDECIN)
+            .accountNonLocked(true)
+            .enabled(false)
+            .failedAttempts(0)
+            .documentsVerified(false)
             .build();
     }
 }
