@@ -1,5 +1,9 @@
 package tn.esprit.controller;
 
+import tn.esprit.entity.Role;
+import tn.esprit.entity.User;
+import tn.esprit.service.UserService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +36,11 @@ public class AdminController {
         log.info("Getting all medecins");
         List<MedecinDto> medecins = userService.getAllMedecins();
         return ResponseEntity.ok(medecins);
+    }
+    @GetMapping("/users/{role}")
+    public ResponseEntity<List<User>> getAllUsersByRole(@PathVariable Role role) {
+
+        return ResponseEntity.ok(userService.getAllUsersByRole(role));
     }
 
     @PostMapping("/verify-medecin/{email}")

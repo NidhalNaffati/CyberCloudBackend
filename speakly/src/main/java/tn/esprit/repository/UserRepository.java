@@ -1,5 +1,6 @@
 package tn.esprit.repository;
 
+
 import org.springframework.data.repository.query.Param;
 import tn.esprit.entity.Role;
 import tn.esprit.entity.User;
@@ -31,6 +32,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.role = 'ROLE_USER' AND u.accountNonLocked = TRUE")
     List<User> findUnlockedUsers();
+    List<User>findAllByRole(Role role);
 
     @Query("SELECT u.email FROM User u WHERE u.role = :role")
     List<String> findEmailsByRole(@Param("role") Role role);

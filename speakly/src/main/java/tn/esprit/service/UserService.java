@@ -1,6 +1,6 @@
 package tn.esprit.service;
 
-
+ 
 import tn.esprit.dto.MedecinDto;
 import tn.esprit.entity.Role;
 import tn.esprit.entity.User;
@@ -234,7 +234,10 @@ public class UserService implements UserDetailsService {
         userRepository.delete(user);
     }
 
-    public void verifyMedecinDocuments(String email) {
+     public List<User> getAllUsersByRole(Role role) {
+        return userRepository.findAllByRole(role);
+}
+     public void verifyMedecinDocuments(String email) {
         User user = findUserByEmail(email);
 
         if (user.getRole() != Role.ROLE_MEDECIN) {
