@@ -77,8 +77,8 @@ public class AuthenticationService {
         tokenService.revokeAllUserTokens(user);
         tokenService.saveUserToken(user, accessToken);
 
-        // Returns an authentication response containing the JWT token
-        return new AuthenticationResponse(accessToken, refreshToken);
+        // Returns an authentication response containing the JWT token and user ID
+        return new AuthenticationResponse(accessToken, refreshToken, user.getId());
     }
 
     @Transactional
@@ -275,8 +275,8 @@ public class AuthenticationService {
                         tokenService.revokeAllUserTokens(userDetails.user()); // revoke all user tokens
                         tokenService.saveUserToken(userDetails.user(), accessToken); // save the new access token
 
-                        // set the result
-                        result = new AuthenticationResponse(accessToken, refreshToken);
+                        // set the result with user ID
+                        result = new AuthenticationResponse(accessToken, refreshToken, userDetails.user().getId());
                     }
                 }
             } catch (ExpiredJwtException ex) { // if the refresh token is expired, return an error
