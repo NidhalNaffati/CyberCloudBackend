@@ -1,5 +1,6 @@
 package tn.esprit.controller;
 
+import tn.esprit.entity.Role;
 import tn.esprit.entity.User;
 import tn.esprit.service.UserService;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,11 @@ public class AdminController {
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+    @GetMapping("/users/{role}")
+    public ResponseEntity<List<User>> getAllUsersByRole(@PathVariable Role role) {
+
+        return ResponseEntity.ok(userService.getAllUsersByRole(role));
     }
 
     @GetMapping("/locked-users")

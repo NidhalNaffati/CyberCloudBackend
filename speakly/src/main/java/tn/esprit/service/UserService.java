@@ -1,6 +1,7 @@
 package tn.esprit.service;
 
 
+import tn.esprit.entity.Role;
 import tn.esprit.entity.User;
 import tn.esprit.exception.AccountLockedException;
 import tn.esprit.exception.EmailAlreadyExistsException;
@@ -221,5 +222,9 @@ public class UserService implements UserDetailsService {
 
         // Then, delete the user
         userRepository.delete(user);
+    }
+
+    public List<User> getAllUsersByRole(Role role) {
+        return userRepository.findAllByRole(role);
     }
 }
