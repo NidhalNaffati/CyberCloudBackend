@@ -59,7 +59,18 @@ jwt:
   # The jwt secret key is used to sign the token.
   secret-key: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
 
+huggingface:
+  api:
+    url: https://api-inference.huggingface.co/models/google/flan-t5-large
+    token: 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
+
+Groq:
+  api:
+    url: https://api.groq.com/v1/embeddings
+    token: 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
+
 verification-code:
   expiration:
     account-activation: 20         # 20 minutes
     reset-password: 10            # 10 minutes
+

@@ -3,6 +3,7 @@ package tn.esprit.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -36,6 +37,18 @@ import java.util.UUID;
 @RequestMapping("/activities")
 public class ActivityController {
 
+    @Value("${huggingface.api.url}")
+    private String hfApiUrl;
+
+    @Value("${huggingface.api.token}")
+    private String hfApiToken;
+
+    // For Groq (separate variables)
+    @Value("${Groq.api.url}")
+    private String groqApiUrl;
+
+    @Value("${Groq.api.token}")
+    private String groqApiToken;
     private final IActivityService activityService;
     private final WaitlistRepository waitlistRepository;
     private final ActivityImageService activityImageService;
@@ -58,6 +71,10 @@ private final WaitlistService waitlistService;
             directory.mkdirs();
         }
     }
+    @GetMapping("/search-nlp")
+    public List<Activity> smartSearch(@RequestParam String q) {
+        return activityService.smartSearchNlp(q);
+    }
     @PostMapping("/ai/describe")
     public ResponseEntity<String> generateDescription(@RequestBody AiPrompt prompt) {
         try {
@@ -69,19 +86,16 @@ private final WaitlistService waitlistService;
     }
 
     private String callHuggingFace(String title) {
-        String apiUrl = "https://api-inference.huggingface.co/models/google/flan-t5-large";
-        String apiToken = "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";
-
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + apiToken);
+        headers.set("Authorization", "Bearer " + hfApiToken);
         headers.set("Content-Type", "application/json");
 
         String prompt = "Write a detailed, engaging, and creative description (about 200 words, two paragraphs) for an activity called '" + title + "'. Highlight its objectives, target audience, timeline, difficulty, and potential rewards. Make it inspiring and informative.";
         String payload = "{\"inputs\": \"" + prompt + "\"}";
         HttpEntity<String> entity = new HttpEntity<>(payload, headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange( hfApiUrl, HttpMethod.POST, entity, String.class);
 
         String body = response.getBody();
         System.out.println("Hugging Face response: " + body); // Debug print
@@ -103,6 +117,7 @@ private final WaitlistService waitlistService;
         }
         return "No description generated.";
     }
+
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseMessage> createActivity(
             @RequestParam("name") String name,
@@ -112,7 +127,6 @@ private final WaitlistService waitlistService;
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam("price") double price,
             @RequestParam(value = "image", required = false) MultipartFile file) {
-
         try {
             String imageUrl = null;
             if (file != null && !file.isEmpty()) {

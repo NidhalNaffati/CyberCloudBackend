@@ -23,4 +23,5 @@ public interface IActivityService {
 
     void notifyWaitlist(Long activityId);
     void addToWaitlist(Long id, String email);
+    public List<Activity> smartSearchNlp(String query);
 }

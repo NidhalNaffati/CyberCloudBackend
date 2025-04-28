@@ -82,10 +82,7 @@ public class SecurityConfig {
 
                 // allow only authenticated admin to this endpoint
                 .requestMatchers("/api/v1/admin/**").hasAuthority("ROLE_ADMIN")
-                    .requestMatchers("/activities/add", "/activities/list").permitAll()
-                    .requestMatchers("/activities/**").authenticated()
-// 👈 Autorisation requise pour toute activité
-                    .requestMatchers("/reservations/**").authenticated() //
+
 
                 // any other request must be authenticated
                 .anyRequest().authenticated())

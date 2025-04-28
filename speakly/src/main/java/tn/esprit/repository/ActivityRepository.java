@@ -18,4 +18,19 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Activity> findByDateGreaterThanEqual(@Param("date") LocalDate date);
     @Query("SELECT a FROM Activity a WHERE a.availableSeats > 0")
     List<Activity> findActivitiesWithAvailableSeats();
+    @Query("SELECT a FROM Activity a WHERE LOWER(a.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    List<Activity> searchActivities(@Param("searchTerm") String searchTerm);
+    @Query("SELECT a FROM Activity a WHERE " +
+            "LOWER(a.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(a.details) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "ORDER BY a.date ASC")
+    List<Activity> fullTextSearch(@Param("query") String query);
+    @Query("SELECT a FROM Activity a WHERE " +
+            "LOWER(a.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(a.details) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "ORDER BY CASE WHEN LOWER(a.name) LIKE LOWER(CONCAT('%', :query, '%')) THEN 0 ELSE 1 END, " +
+            "a.date ASC")
+    List<Activity> advancedSearch(@Param("query") String query);
+    @Query("SELECT a FROM Activity a WHERE a.date >= CURRENT_DATE ORDER BY a.date ASC")
+    List<Activity> findUpcomingActivities();
 }
