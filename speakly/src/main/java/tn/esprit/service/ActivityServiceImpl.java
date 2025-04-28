@@ -37,7 +37,7 @@ public class ActivityServiceImpl implements IActivityService {
     private final WaitlistRepository waitlistRepository;
     private final WaitlistService waitlistService;
 
-@Autowired
+    @Autowired
     private EmailService emailService;
     private static final Logger logger = LoggerFactory.getLogger(ActivityServiceImpl.class);
     @Autowired
@@ -343,4 +343,3 @@ public class ActivityServiceImpl implements IActivityService {
         waitlistService.checkAndNotifyForActivity(activityId);
     }
 }
-

@@ -20,6 +20,8 @@ public class WaitlistService {
     private final ActivityServiceImpl activityService;
    private final WaitlistRepository waitlistRepository;
    private final EmailService emailService;
+
+
     public WaitlistService(@Lazy ActivityServiceImpl activityService, WaitlistRepository waitlistRepository, EmailService emailService) {
         this.activityService = activityService;
         this.waitlistRepository = waitlistRepository;

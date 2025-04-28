@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #70747F;
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h2 {
+            font-family: 'Fredoka', sans-serif;
+            color: #393D72;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            background-color: #FFECF2;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        strong {
+            color: #393D72;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #70747F;
+        }
+
+        .header {
+            color: #FF4880;
+            border-bottom: 2px solid #FF4880;
+            display: inline-block;
+            padding: 5px 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+    <title>Document Submission Received</title>
+</head>
+<body>
+<div class="content">
+    <div class="header">Submission Received</div>
+    <h2>Hello {{firstName}},</h2>
+    <p>We have received your document submission. It is currently <strong>{{status}}</strong> for approval.</p>
+    <p>We will notify you once the review process is complete.</p>
+    <p>Best regards,<br/>Speakly Team</p>
+</div>
+<div class="footer">
+    <p>© {{currentYear}} Speakly Team. All rights reserved.</p>
+</div>
+</body>
+</html>

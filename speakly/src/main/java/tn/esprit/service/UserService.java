@@ -1,6 +1,8 @@
 package tn.esprit.service;
 
 
+import tn.esprit.dto.MedecinDto;
+import tn.esprit.entity.Role;
 import tn.esprit.entity.User;
 import tn.esprit.exception.AccountLockedException;
 import tn.esprit.exception.EmailAlreadyExistsException;
@@ -19,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The UserService class handles business logic related to user accounts, such as saving and retrieving users,
@@ -33,6 +36,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenRepository tokenRepository;
+    private final EmailService emailService;
 
     /**
      * Loads a user from the database by their email address.
@@ -45,8 +49,8 @@ public class UserService implements UserDetailsService {
     public UserDetailsImpl loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("loading user by username: {}", username);
         User user = userRepository
-            .findByEmail(username) // find the user by email
-            .orElseThrow(() -> new UsernameNotFoundException("user not found")); // if the user is not found, throw an exception
+                .findByEmail(username) // find the user by email
+                .orElseThrow(() -> new UsernameNotFoundException("user not found")); // if the user is not found, throw an exception
         return new UserDetailsImpl(user);
     }
 
@@ -70,8 +74,15 @@ public class UserService implements UserDetailsService {
      */
     public User findUserByEmail(String email) {
         return userRepository
-            .findByEmail(email)
-            .orElseThrow(() -> new UserNotFoundException("no user with email: " + email + " found"));
+                .findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("no user with email: " + email + " found"));
+    }
+
+    public boolean emailExistsForAnotherUser(String email, String currentEmail) {
+        if (email.equals(currentEmail)) {
+            return false; // Same email, so it doesn't exist for another user
+        }
+        return emailExists(email);
     }
 
     /**
@@ -138,7 +149,7 @@ public class UserService implements UserDetailsService {
      */
     public User validateCredentials(String email, String password) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) { // If the password is incorrect
             // Increment failed attempts
@@ -221,5 +232,69 @@ public class UserService implements UserDetailsService {
 
         // Then, delete the user
         userRepository.delete(user);
+    }
+
+    public List<User> getAllUsersByRole(Role role) {
+        return userRepository.findAllByRole(role);
+    }
+    public void verifyMedecinDocuments(String email) {
+        User user = findUserByEmail(email);
+
+        if (user.getRole() != Role.ROLE_MEDECIN) {
+            throw new IllegalStateException("User is not registered as a medecin");
+        }
+
+        // Set documents as verified and ensure the account is enabled
+        user.setDocumentsVerified(true);
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        // Send notification email to inform the medecin
+        emailService.sendDocumentVerificationSuccessful(
+                user.getEmail(),
+                user.getFirstName()
+        );
+
+        log.info("Documents verified for medecin with email: {}", email);
+    }
+
+    public void unverifyMedecinDocuments(String email) {
+        User user = findUserByEmail(email);
+
+        if (user.getRole() != Role.ROLE_MEDECIN) {
+            throw new IllegalStateException("User is not registered as a medecin");
+        }
+
+        user.setDocumentsVerified(false);
+        userRepository.save(user);
+
+        // Send notification email to inform the medecin about verification revocation
+        emailService.sendDocumentVerificationRejected(
+                user.getEmail(),
+                user.getFirstName()
+        );
+
+        log.info("Documents marked as unverified for medecin with email: {}", email);
+    }
+
+    public List<MedecinDto> getAllMedecins() {
+        List<User> medecins = userRepository.findUsersByRole(Role.ROLE_MEDECIN);
+        return medecins.stream()
+                .map(user -> new MedecinDto(
+                        user.getId(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getEmail(),
+                        user.getRole(),
+                        user.isEnabled(),
+                        user.isAccountNonLocked(),
+                        user.getCreatedAt(),
+                        user.getDocumentsVerified()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public String getAdminFullName(long id) {
+        return userRepository.getAdminFullName(id);
     }
 }

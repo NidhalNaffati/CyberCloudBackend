@@ -14,4 +14,5 @@ public class UserController {
         return ResponseEntity.ok("Hello user u are reading this message from a protected endpoint. Only users can access this endpoint.");
     }
 
+
 }

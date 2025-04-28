@@ -34,11 +34,11 @@ public class RestExceptionHandler {
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
 
         List<String> errorList = exception
-          .getBindingResult()
-          .getFieldErrors()
-          .stream()
-          .map(DefaultMessageSourceResolvable::getDefaultMessage)
-          .toList();
+                .getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .toList();
 
         ErrorResponse response = new ErrorResponse();
         response.setStatus(UNPROCESSABLE_ENTITY);
@@ -123,6 +123,30 @@ public class RestExceptionHandler {
     public ResponseEntity<Object> handleAccountLockedException(AccountLockedException exception) {
         ErrorResponse response = new ErrorResponse();
         response.setStatus(LOCKED);
+        response.setMessage(exception.getReason());
+        return buildResponseEntity(response);
+    }
+
+    @ExceptionHandler(AccountNotVerifiedException.class)
+    public ResponseEntity<Object> handleAccountNotVerifiedException(AccountNotVerifiedException exception) {
+        ErrorResponse response = new ErrorResponse();
+        response.setStatus(BAD_REQUEST);
+        response.setMessage(exception.getReason());
+        return buildResponseEntity(response);
+    }
+
+    @ExceptionHandler(DocumentNotFoundException.class)
+    public ResponseEntity<Object> handleDocumentNotFoundException(DocumentNotFoundException exception) {
+        ErrorResponse response = new ErrorResponse();
+        response.setStatus(BAD_REQUEST);
+        response.setMessage(exception.getReason());
+        return buildResponseEntity(response);
+    }
+
+    @ExceptionHandler(InvalidDocumentException.class)
+    public ResponseEntity<Object> handleInvalidDocumentException(InvalidDocumentException exception) {
+        ErrorResponse response = new ErrorResponse();
+        response.setStatus(BAD_REQUEST);
         response.setMessage(exception.getReason());
         return buildResponseEntity(response);
     }

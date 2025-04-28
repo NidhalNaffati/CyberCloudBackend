@@ -52,7 +52,7 @@ public class ActivityController {
     private final IActivityService activityService;
     private final WaitlistRepository waitlistRepository;
     private final ActivityImageService activityImageService;
-private final WaitlistService waitlistService;
+    private final WaitlistService waitlistService;
     private final String uploadDir;
 
 
