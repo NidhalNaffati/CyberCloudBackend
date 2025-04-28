@@ -117,16 +117,12 @@ public class ActivityServiceImpl implements IActivityService {
 
     @Override
     public List<Activity> recommanderActivitesSelonJour() {
-        // Get today's date
+
         LocalDate today = LocalDate.now();
 
-        // Find activities happening today
         List<Activity> todayActivities = activityRepository.findByDate(today);
 
-        // If no activities today, you could add fallback logic like:
-        // - Get upcoming activities
-        // - Get popular activities
-        // - Get random activities
+
 
         return todayActivities;
     }
@@ -142,9 +138,6 @@ public class ActivityServiceImpl implements IActivityService {
 
         }
     }
-
-
-
     @Override
     public void addToWaitlist(Long activityId, String email) {
         Activity activity = activityRepository.findById(activityId)
