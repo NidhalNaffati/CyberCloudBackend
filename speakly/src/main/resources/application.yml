@@ -1,5 +1,5 @@
 application:
-  name: gestion-users
+  name: speakly
 
 server:
   port: 8080
