@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class CloudDinaryConfiguiration {
+public class CloudDinaryConfiguiration { // dinay mta3 raguouge HaHaHaHa
     private  final String Cloud_Name="df5xsjsak";
     private  final String Api_Key="174531824619371";
     private  final String Api_Secret="rnThylK7z3uHm73a7FsAnn7uBGg";

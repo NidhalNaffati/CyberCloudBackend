@@ -1,28 +1,20 @@
 application:
-  name: speakly
+  name: gestion-users
 
 server:
-  port: 8089
+  port: 8080
 
-logging:
-  level:
-    org:
-      springframework=DEBUG:
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/speakly?createDatabaseIfNotExist=true
+    url: jdbc:mysql://speekly_db:3306/speekly_db?createDatabaseIfNotExist=true
     username: "root"
-
-    password: "12300"
-
+    password: ""
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     show-sql: true
     hibernate:
-
       ddl-auto: update
-
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
@@ -47,7 +39,6 @@ spring:
 
 # The admin username and password are used to create the admin account when the application starts.
 admin:
-
   username: "nidhalnaffati@gmail.com"
   password: "nidhal123"
 
@@ -87,4 +78,3 @@ verification-code:
   expiration:
     account-activation: 20         # 20 minutes
     reset-password: 10            # 10 minutes
-

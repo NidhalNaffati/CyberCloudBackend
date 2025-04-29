@@ -79,7 +79,8 @@ public class User {
     private MedecinDocument document;
 
     @JsonBackReference("user-appointments")
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany
+    @JoinColumn(name = "user_id")
     private List<Appointment> appointments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
