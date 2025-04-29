@@ -8,7 +8,10 @@ logging:
   level:
     org:
       springframework=DEBUG:
+
 spring:
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     url: jdbc:mysql://localhost:3306/speakly?createDatabaseIfNotExist=true
     username: "root"
@@ -18,7 +21,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
@@ -41,7 +44,12 @@ spring:
     ansi:
       enabled: always
 
-# The admin username and password are used to create the admin account when the application starts.
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 admin:
   username: "nidhalnaffati@gmail.com"
   password: "nidhal123"
@@ -50,12 +58,10 @@ user:
   username: "user@mail.com"
   password: "user123"
 
-
 badwords:
   api:
     url: https://openrouter.ai/api/v1/chat/completions
     key: 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
-
 
 jwt:
   expiration:
@@ -64,10 +70,9 @@ jwt:
     reset-password: 900000         # 15 minutes
     enable-account: 900000
 
-  # The jwt secret key is used to sign the token.
   secret-key: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
 
 verification-code:
   expiration:
     account-activation: 20         # 20 minutes
-    reset-password: 10            # 10 minutes
+    reset-password: 10             # 10 minutes
