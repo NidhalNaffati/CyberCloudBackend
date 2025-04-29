@@ -64,10 +64,10 @@ public class AuthenticationService {
 
         // Attempts to authenticate the user with the provided email and password
         authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.email(),
-                request.password()
-            )
+                new UsernamePasswordAuthenticationToken(
+                        request.email(),
+                        request.password()
+                )
         );
 
 
@@ -77,8 +77,8 @@ public class AuthenticationService {
         tokenService.revokeAllUserTokens(user);
         tokenService.saveUserToken(user, accessToken);
 
-        // Returns an authentication response containing the JWT token
-        return new AuthenticationResponse(accessToken, refreshToken);
+        // Returns an authentication response containing the JWT token and user ID
+        return new AuthenticationResponse(accessToken, refreshToken, user.getId());
     }
 
     @Transactional
@@ -112,22 +112,22 @@ public class AuthenticationService {
 
             // Generate a verification code
             VerificationCode verificationCode = verificationCodeService.createVerificationCode(
-                registerRequest.email(),
-                VerificationCode.CodeType.ACCOUNT_ACTIVATION
+                    registerRequest.email(),
+                    VerificationCode.CodeType.ACCOUNT_ACTIVATION
             );
 
             // Send the verification code email
             log.info("Sending activation code {} to user {}", verificationCode.getCode(), registerRequest.email());
 
             emailService.sendActivationCode(
-                registerRequest.email(),
-                registerRequest.firstName(),
-                verificationCode.getCode()
+                    registerRequest.email(),
+                    registerRequest.firstName(),
+                    verificationCode.getCode()
             );
 
             emailService.sendDocumentSubmissionWaitingApproval(
-                registerRequest.email(),
-                registerRequest.firstName()
+                    registerRequest.email(),
+                    registerRequest.firstName()
             );
 
             log.info("Medecin successfully registered with request {}", registerRequest);
@@ -158,17 +158,17 @@ public class AuthenticationService {
 
             // Generate a verification code
             VerificationCode verificationCode = verificationCodeService.createVerificationCode(
-                registerRequest.email(),
-                VerificationCode.CodeType.ACCOUNT_ACTIVATION
+                    registerRequest.email(),
+                    VerificationCode.CodeType.ACCOUNT_ACTIVATION
             );
 
             // Send the verification code email
             log.info("Sending activation code {} to user {}", verificationCode.getCode(), registerRequest.email());
 
             emailService.sendActivationCode(
-                registerRequest.email(),
-                registerRequest.firstName(),
-                verificationCode.getCode()
+                    registerRequest.email(),
+                    registerRequest.firstName(),
+                    verificationCode.getCode()
             );
 
             log.info("User successfully registered with request {}", registerRequest);
@@ -197,8 +197,8 @@ public class AuthenticationService {
 
         // Generate a verification code
         VerificationCode verificationCode = verificationCodeService.createVerificationCode(
-            email,
-            VerificationCode.CodeType.PASSWORD_RESET
+                email,
+                VerificationCode.CodeType.PASSWORD_RESET
         );
 
         try {
@@ -275,8 +275,8 @@ public class AuthenticationService {
                         tokenService.revokeAllUserTokens(userDetails.user()); // revoke all user tokens
                         tokenService.saveUserToken(userDetails.user(), accessToken); // save the new access token
 
-                        // set the result
-                        result = new AuthenticationResponse(accessToken, refreshToken);
+                        // set the result with user ID
+                        result = new AuthenticationResponse(accessToken, refreshToken, userDetails.user().getId());
                     }
                 }
             } catch (ExpiredJwtException ex) { // if the refresh token is expired, return an error

@@ -4,13 +4,9 @@ application:
 server:
   port: 8080
 
-logging:
-  level:
-    org:
-      springframework=DEBUG:
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/speaklyIntegration?createDatabaseIfNotExist=true
+    url: jdbc:mysql://speekly_db:3306/speekly_db?createDatabaseIfNotExist=true
     username: "root"
     password: ""
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -54,6 +50,10 @@ user:
   username: "user@mail.com"
   password: "user123"
 
+huggingface:
+  api:
+    url: https://api-inference.huggingface.co/models/google/flan-t5-large
+    token: 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
 
 badwords:
   api:
@@ -70,6 +70,13 @@ jwt:
 
   # The jwt secret key is used to sign the token.
   secret-key: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
+
+
+Groq:
+  api:
+    url: https://api.groq.com/openai/v1/chat/completions
+    token: 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
+    model: llama3-70b-8192  # Groq's current flagship model
 
 verification-code:
   expiration:

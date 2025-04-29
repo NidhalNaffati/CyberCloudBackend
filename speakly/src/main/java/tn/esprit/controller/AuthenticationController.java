@@ -25,8 +25,8 @@ public class AuthenticationController {
 
     @PostMapping("/register/medecin")
     public ResponseEntity<String> registerMedecin(
-        @RequestPart("request") @Valid RegisterRequest request,
-        @RequestPart(value = "document", required = false) MultipartFile document) {
+            @RequestPart("request") @Valid RegisterRequest request,
+            @RequestPart(value = "document", required = false) MultipartFile document) {
 
         if (request.role() != Role.ROLE_MEDECIN) {
             return ResponseEntity.badRequest().body("Invalid role for medecin registration");
@@ -56,10 +56,10 @@ public class AuthenticationController {
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
         authenticationService.resetPassword(
-            request.getEmail(),
-            request.getCode(),
-            request.getNewPassword(),
-            request.getConfirmPassword()
+                request.getEmail(),
+                request.getCode(),
+                request.getNewPassword(),
+                request.getConfirmPassword()
         );
         return ResponseEntity.ok("Password reset successful");
     }

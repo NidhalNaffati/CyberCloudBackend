@@ -3,10 +3,12 @@ package tn.esprit.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +30,9 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:4200")
@@ -36,6 +40,18 @@ import java.util.UUID;
 @RequestMapping("/activities")
 public class ActivityController {
 
+    @Value("${huggingface.api.url}")
+    private String hfApiUrl;
+
+    @Value("${huggingface.api.token}")
+    private String hfApiToken;
+
+
+    @Value("${Groq.api.url}")
+    private String groqApiUrl;
+
+    @Value("${Groq.api.token}")
+    private String groqApiToken;
     private final IActivityService activityService;
     private final WaitlistRepository waitlistRepository;
     private final ActivityImageService activityImageService;
@@ -58,51 +74,129 @@ public class ActivityController {
             directory.mkdirs();
         }
     }
+    @GetMapping("/search-nlp")
+    public List<Activity> smartSearch(@RequestParam String q) {
+        return activityService.smartSearchNlp(q);
+    }
     @PostMapping("/ai/describe")
     public ResponseEntity<String> generateDescription(@RequestBody AiPrompt prompt) {
-        try {
-            String description = callHuggingFace(prompt.getTitle());
-            return ResponseEntity.ok(description);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("AI error: " + e.getMessage());
+        if (prompt.getTitle() == null || prompt.getTitle().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Title cannot be empty");
         }
+
+        // Try Hugging Face first
+        String description = callHuggingFaceWithRetry(prompt.getTitle(), 3); // Retry 3 times
+
+        // Fallback to Groq if Hugging Face fails
+        if (description.startsWith("Failed") || description.contains("unavailable")) {
+            description = callGroqApi(prompt.getTitle());
+        }
+
+        return ResponseEntity.ok(description);
+    }
+    private String callGroqApi(String title) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            // Configure timeout
+            restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+            ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory())
+                    .setConnectTimeout(10000); // 10 seconds timeout
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + groqApiToken);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // Build the proper request format for Groq's current API
+            Map<String, Object> request = new HashMap<>();
+            request.put("model", "llama3-70b-8192"); // Current recommended model
+            request.put("messages", List.of(
+                    Map.of("role", "user",
+                            "content", "Write a 200-word engaging description for an activity titled: '" +
+                                    title + "'. Include objectives, target audience, and benefits.")
+            ));
+            request.put("max_tokens", 350); // Enough for ~200 words
+            request.put("temperature", 0.7); // Creativity control
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+
+            // Make the API call
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    groqApiUrl,
+                    entity,
+                    String.class
+            );
+
+            // Process response
+            if (response.getStatusCode() == HttpStatus.OK) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode jsonNode = mapper.readTree(response.getBody());
+
+                // Extract the generated text
+                return jsonNode.path("choices")
+                        .get(0)
+                        .path("message")
+                        .path("content")
+                        .asText();
+            } else {
+                // Handle API errors
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode errorNode = mapper.readTree(response.getBody());
+                return "Groq API Error: " + errorNode.path("error").path("message").asText();
+            }
+        } catch (Exception e) {
+            return "Failed to call Groq API: " + e.getMessage();
+        }
+    }
+    private String callHuggingFaceWithRetry(String title, int maxRetries) {
+        for (int i = 0; i < maxRetries; i++) {
+            String result = callHuggingFace(title);
+            if (!result.contains("unavailable") && !result.contains("loading")) {
+                return result;
+            }
+            try {
+                Thread.sleep(5000); // Wait 5s between retries
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return "Request interrupted.";
+            }
+        }
+        return "Hugging Face API is temporarily unavailable.";
     }
 
     private String callHuggingFace(String title) {
-        String apiUrl = "https://api-inference.huggingface.co/models/google/flan-t5-large";
-        String apiToken = "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";
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + apiToken);
-        headers.set("Content-Type", "application/json");
-
-        String prompt = "Write a detailed, engaging, and creative description (about 200 words, two paragraphs) for an activity called '" + title + "'. Highlight its objectives, target audience, timeline, difficulty, and potential rewards. Make it inspiring and informative.";
-        String payload = "{\"inputs\": \"" + prompt + "\"}";
-        HttpEntity<String> entity = new HttpEntity<>(payload, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
-
-        String body = response.getBody();
-        System.out.println("Hugging Face response: " + body); // Debug print
-
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode arr = mapper.readTree(body);
-            if (arr.isArray() && arr.size() > 0) {
-                JsonNode first = arr.get(0);
-                if (first.has("generated_text")) {
-                    return first.get("generated_text").asText();
-                }
-                if (first.has("output")) {
-                    return first.get("output").asText();
-                }
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + hfApiToken);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // Simplify prompt for faster response
+            String prompt = "Write a 1-paragraph description for: " + title;
+            Map<String, Object> payload = Map.of(
+                    "inputs", prompt,
+                    "parameters", Map.of("max_length", 150)
+            );
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    hfApiUrl,
+                    entity,
+                    String.class
+            );
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode jsonNode = mapper.readTree(response.getBody());
+                return jsonNode.get(0).get("generated_text").asText();
+            } else {
+                return "API Error: " + response.getStatusCode();
             }
         } catch (Exception e) {
-            System.out.println("Error parsing Hugging Face response: " + e.getMessage());
+            return "Failed to call Hugging Face: " + e.getMessage();
         }
-        return "No description generated.";
     }
+
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseMessage> createActivity(
             @RequestParam("name") String name,
@@ -112,7 +206,6 @@ public class ActivityController {
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam("price") double price,
             @RequestParam(value = "image", required = false) MultipartFile file) {
-
         try {
             String imageUrl = null;
             if (file != null && !file.isEmpty()) {

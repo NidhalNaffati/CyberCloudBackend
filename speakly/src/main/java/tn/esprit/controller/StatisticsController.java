@@ -1,6 +1,8 @@
 package tn.esprit.controller;
 
+
 import io.swagger.v3.oas.annotations.Operation;
+
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.service.IStatisticsService;
 
 import java.util.Date;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -147,6 +150,9 @@ public class StatisticsController {
             @PathVariable Long activityId) {
         return ResponseEntity.ok(statisticsService.getActivityMetrics(activityId));
     }
+
+
+
     @Operation(summary = "Get rating distribution of complaints")
     @GetMapping("/ratings")
     public ResponseEntity<Map<Integer, Long>> getRatingDistribution() {

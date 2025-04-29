@@ -34,11 +34,11 @@ public class RestExceptionHandler {
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
 
         List<String> errorList = exception
-          .getBindingResult()
-          .getFieldErrors()
-          .stream()
-          .map(DefaultMessageSourceResolvable::getDefaultMessage)
-          .toList();
+                .getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .toList();
 
         ErrorResponse response = new ErrorResponse();
         response.setStatus(UNPROCESSABLE_ENTITY);

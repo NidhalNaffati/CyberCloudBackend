@@ -1,11 +1,11 @@
 package tn.esprit.service;
 
 
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 import tn.esprit.entity.Token;
 import tn.esprit.entity.User;
 import tn.esprit.repository.TokenRepository;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 
 /**
  * Service class for managing tokens. Uses TokenRepository to retrieve and save tokens.

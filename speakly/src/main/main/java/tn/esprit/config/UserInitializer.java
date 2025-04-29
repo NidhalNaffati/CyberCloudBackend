@@ -10,15 +10,16 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import static tn.esprit.entity.Role.ROLE_ADMIN;
+import java.util.function.Supplier;
 
-/**
- * Initializes the admin user if it does not already exist.
- */
+import static tn.esprit.entity.Role.ROLE_ADMIN;
+import static tn.esprit.entity.Role.ROLE_USER;
+
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AdminInitializer implements ApplicationRunner {
+public class UserInitializer implements ApplicationRunner {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -28,6 +29,10 @@ public class AdminInitializer implements ApplicationRunner {
 
     @Value("${admin.password}")
     private String adminPassword;
+
+    private final String USERNAME = "user@mail.com";
+
+    private final String USERPASSWORD = "password123";
 
     private User buildAdminUser() {
         return User.builder()
@@ -42,17 +47,35 @@ public class AdminInitializer implements ApplicationRunner {
             .build();
     }
 
+    private User buildRegularUser() {
+        return User.builder()
+            .firstName("User")
+            .lastName("Demo")
+            .email(USERNAME)
+            .password(USERPASSWORD)
+            .confirmPassword(USERPASSWORD)
+            .role(ROLE_USER)
+            .enabled(true)
+            .accountNonLocked(true)
+            .build();
+    }
+
     @Override
     public void run(ApplicationArguments args) {
-        if (userRepository.existsByEmail(adminUsername)) {
-            log.info("Admin user already exists.\n username: {}", adminUsername);
+        initializeUser(adminUsername, this::buildAdminUser, "Admin");
+        initializeUser(USERNAME, this::buildRegularUser, "Regular user");
+    }
+
+    private void initializeUser(String username, Supplier<User> userSupplier, String userType) {
+        if (userRepository.existsByEmail(username)) {
+            log.info("{} user already exists. username: {}", userType, username);
             return;
         }
 
-        User admin = buildAdminUser();
-        admin.setPassword(passwordEncoder.encode(adminPassword));
-        userRepository.save(admin);
+        User user = userSupplier.get();
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
 
-        log.info("Admin user created successfully. username: {}", adminUsername);
+        log.info("{} user created successfully. username: {}", userType, username);
     }
 }

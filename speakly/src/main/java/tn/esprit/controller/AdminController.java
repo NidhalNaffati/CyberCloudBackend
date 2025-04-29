@@ -45,8 +45,8 @@ public class AdminController {
 
     @PostMapping("/verify-medecin/{email}")
     public ResponseEntity<String> verifyMedecinDocuments(
-        @PathVariable String email,
-        @RequestBody(required = false) Map<String, Boolean> requestBody) {
+            @PathVariable String email,
+            @RequestBody(required = false) Map<String, Boolean> requestBody) {
 
         // Default to verifying if no specific request is made
         boolean verified = true;

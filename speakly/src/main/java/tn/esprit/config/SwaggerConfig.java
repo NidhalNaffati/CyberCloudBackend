@@ -12,22 +12,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @SecurityScheme(
-    name = "bearerAuth",
-    description = "JWT auth description",
-    scheme = "bearer",
-    type = SecuritySchemeType.HTTP,
-    bearerFormat = "JWT",
-    in = SecuritySchemeIn.HEADER
+        name = "bearerAuth",
+        description = "JWT auth description",
+        scheme = "bearer",
+        type = SecuritySchemeType.HTTP,
+        bearerFormat = "JWT",
+        in = SecuritySchemeIn.HEADER
 )
 @OpenAPIDefinition(
-    info = @io.swagger.v3.oas.annotations.info.Info(
-        title = "Speakly API",
-        version = "1.0",
-        description = "Speakly API"
-    ),
-    security = {
-        @SecurityRequirement(name = "bearerAuth")
-    }
+        info = @io.swagger.v3.oas.annotations.info.Info(
+                title = "Speakly API",
+                version = "1.0",
+                description = "Speakly API"
+        ),
+        security = {
+                @SecurityRequirement(name = "bearerAuth")
+        }
 )
 @Configuration
 public class SwaggerConfig {
@@ -35,10 +35,10 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-            .components(new Components())
-            .info(new Info()
-                .title("Speakly API")
-                .version("1.0")
-                .description("Speakly API"));
+                .components(new Components())
+                .info(new Info()
+                        .title("Speakly API")
+                        .version("1.0")
+                        .description("Speakly API"));
     }
 }

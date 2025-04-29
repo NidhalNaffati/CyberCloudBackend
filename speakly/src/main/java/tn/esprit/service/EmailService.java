@@ -99,8 +99,8 @@ public class EmailService {
     }
 
     private void sendEmailWithVerificationCode(
-        String email, String firstName, String subject, String code,
-        String template, int expirationMinutes) {
+            String email, String firstName, String subject, String code,
+            String template, int expirationMinutes) {
 
         String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
         String senderName = "Speakly Team";
@@ -117,9 +117,9 @@ public class EmailService {
             String content = new String(Files.readAllBytes(resource.getFile().toPath()));
 
             content = content.replace("{{firstName}}", firstName)
-                .replace("{{verificationCode}}", code)
-                .replace("{{currentYear}}", currentYear)
-                .replace("{{expirationTimeInMinutes}}", String.valueOf(expirationMinutes));
+                    .replace("{{verificationCode}}", code)
+                    .replace("{{currentYear}}", currentYear)
+                    .replace("{{expirationTimeInMinutes}}", String.valueOf(expirationMinutes));
 
             helper.setText(content, true);
             mailSender.send(message);
@@ -167,8 +167,8 @@ public class EmailService {
 
 
     private void sendEmailWithTemplate(
-        String email, String firstName, String subject, String url,
-        String template, long expirationTimeInMs) {
+            String email, String firstName, String subject, String url,
+            String template, long expirationTimeInMs) {
 
         String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
         int expirationTimeInMinutes = (int) (expirationTimeInMs / 60000);
@@ -186,9 +186,9 @@ public class EmailService {
             String content = new String(Files.readAllBytes(resource.getFile().toPath()));
 
             content = content.replace("{{firstName}}", firstName)
-                .replace("{{activationLink}}", url)
-                .replace("{{currentYear}}", currentYear)
-                .replace("{{expirationTimeInMinutes}}", String.valueOf(expirationTimeInMinutes));
+                    .replace("{{activationLink}}", url)
+                    .replace("{{currentYear}}", currentYear)
+                    .replace("{{expirationTimeInMinutes}}", String.valueOf(expirationTimeInMinutes));
 
             helper.setText(content, true);
             mailSender.send(message);
@@ -199,6 +199,7 @@ public class EmailService {
             log.error("Failed to send email to {}", email, e);
         }
     }
+
     public void sendPaymentEmail(String to, String name, Facture facture) throws Exception {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -221,6 +222,7 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
     public void sendRemboursementDecisionEmail(String to, String name, Remboursement remboursement) throws Exception {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -244,7 +246,6 @@ public class EmailService {
 
         mailSender.send(message);
     }
-
 
     private void sendGenericEmail(String email, String firstName, String subject, String template, String status) {
         String senderName = "Speakly Team";
@@ -277,5 +278,36 @@ public class EmailService {
         }
     }
 
+    public void sendAppointmentConfirmation(String email, String firstName, String appointmentDate, String startTime, String endTime) {
+        String template = "templates/appointment-confirmation.html";
+        String subject = "Your Appointment is Confirmed";
+        String senderName = "Speakly Team";
+        String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
 
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail, senderName);
+            helper.setTo(email);
+            helper.setSubject(subject);
+
+            // Load and process template
+            ClassPathResource resource = new ClassPathResource(template);
+            String content = new String(Files.readAllBytes(resource.getFile().toPath()));
+
+            content = content.replace("{{firstName}}", firstName)
+                .replace("{{appointmentDate}}", appointmentDate)
+                .replace("{{startTime}}", startTime)
+                .replace("{{endTime}}", endTime)
+                .replace("{{currentYear}}", currentYear);
+
+            helper.setText(content, true);
+            mailSender.send(message);
+
+            log.info("Appointment confirmation sent to {}", email);
+        } catch (MessagingException | IOException e) {
+            log.error("Error sending appointment confirmation to {}", email, e);
+        }
+    }
 }

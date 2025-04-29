@@ -412,6 +412,29 @@ public class StatisticsService implements IStatisticsService {
     }
 
 
+
+    public Map<String, Long> getComplaintStatistics() {
+        Map<String, Long> stats = new HashMap<>();
+
+        // Read/Unread statistics
+        stats.put("readComplaints", statisticsRepository.countByReadStatus(true));
+        stats.put("unreadComplaints", statisticsRepository.countByReadStatus(false));
+
+        // Urgent/Normal statistics
+        stats.put("urgentComplaints", statisticsRepository.countByUrgencyStatus(true));
+        stats.put("normalComplaints", statisticsRepository.countByUrgencyStatus(false));
+
+        // Rating statistics
+        for (int i = 0; i <= 5; i++) {
+            stats.put("rating" + i, statisticsRepository.countByRating(i));
+        }
+
+        // Total complaints
+        stats.put("totalComplaints", statisticsRepository.countAllComplaints());
+
+        return stats;
+    }
+
     @Override
     public Map<Integer, Long> getRatingDistribution() {
         Map<Integer, Long> ratingStats = new HashMap<>();
@@ -420,6 +443,7 @@ public class StatisticsService implements IStatisticsService {
         }
         return ratingStats;
     }
+
 
     @Override
     public Map<String, Long> getStatusStatistics() {

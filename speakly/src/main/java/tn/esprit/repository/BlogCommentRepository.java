@@ -10,7 +10,7 @@ import java.util.List;
 public interface BlogCommentRepository extends JpaRepository<BlogComment, Long> {
     List<BlogComment> findByBlogPost_PostId(Long postId);
 
-    // Méthode pour récupérer tous les commentaires d'un utilisateur spécifique
+
     List<BlogComment> findByUserId(Long userId);
 }
 

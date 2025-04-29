@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #70747F;
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h2 {
+            font-family: 'Fredoka', sans-serif;
+            color: #393D72;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            background-color: #E7F6F2;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        strong {
+            color: #393D72;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #70747F;
+        }
+
+        .header {
+            color: #2C7865;
+            border-bottom: 2px solid #2C7865;
+            display: inline-block;
+            padding: 5px 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <div class="header">Appointment Confirmation</div>
+    <h2>Hello {{firstName}},</h2>
+    <p>Your appointment has been successfully scheduled.</p>
+    <p><strong>Date:</strong> {{appointmentDate}}</p>
+    <p><strong>Time:</strong> {{startTime}} - {{endTime}}</p>
+    <p>Thank you for choosing our service. We look forward to seeing you!</p>
+    <p>Best regards,<br/>The Appointment Team</p>
+</div>
+<div class="footer">
+    <p>&copy; {{currentYear}} Appointment Team. All rights reserved.</p>
+</div>
+</body>
+</html>

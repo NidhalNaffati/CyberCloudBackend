@@ -54,25 +54,25 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     // The list of public endpoints that do not require authentication
     private static final List<String> PUBLIC_ENDPOINTS = List.of(
-        "/api/v1/auth/register/**",
-        "/api/v1/auth/refresh-token",
-        "/api/v1/auth/verify-user",
-        "/api/v1/auth/authenticate",
-        "/api/v1/auth/forgot-password",
-        "/api/v1/auth/reset-password",
+            "/api/v1/auth/register/**",
+            "/api/v1/auth/refresh-token",
+            "/api/v1/auth/verify-user",
+            "/api/v1/auth/authenticate",
+            "/api/v1/auth/forgot-password",
+            "/api/v1/auth/reset-password",
 
-        // Swagger endpoints
-        "/v2/api-docs", "/v3/api-docs", "/v3/api-docs/**",
-        "/swagger-resources", "/swagger-resources/**",
-        "/configuration/ui", "/configuration/security",
-        "/swagger-ui/**", "/webjars/**", "/swagger-ui.html"
+            // Swagger endpoints
+            "/v2/api-docs", "/v3/api-docs", "/v3/api-docs/**",
+            "/swagger-resources", "/swagger-resources/**",
+            "/configuration/ui", "/configuration/security",
+            "/swagger-ui/**", "/webjars/**", "/swagger-ui.html"
     );
 
     @Override
     protected void doFilterInternal(
-        @NonNull HttpServletRequest request,
-        @NonNull HttpServletResponse response,
-        @NonNull FilterChain filterChain
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         // Check if the request is for a public endpoint
         if (isPublicEndpoint(request)) {
@@ -123,9 +123,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         // Create a new authentication token with the retrieved user
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-            userDetails,
-            null,
-            userDetails.getAuthorities()
+                userDetails,
+                null,
+                userDetails.getAuthorities()
         );
         // Set the details of the authentication token
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

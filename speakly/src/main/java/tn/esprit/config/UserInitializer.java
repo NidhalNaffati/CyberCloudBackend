@@ -38,29 +38,29 @@ public class UserInitializer implements ApplicationRunner {
 
     private User buildAdminUser() {
         return User.builder()
-            .firstName("admin")
-            .lastName("admin")
-            .email(adminUsername)
-            .password(adminPassword)
-            .confirmPassword(adminPassword)
-            .role(ROLE_ADMIN)
-            .enabled(true)
-            .accountNonLocked(true)
-            .documentsVerified(true)
-            .build();
+                .firstName("admin")
+                .lastName("admin")
+                .email(adminUsername)
+                .password(adminPassword)
+                .confirmPassword(adminPassword)
+                .role(ROLE_ADMIN)
+                .enabled(true)
+                .accountNonLocked(true)
+                .documentsVerified(true)
+                .build();
     }
 
     private User buildRegularUser() {
         return User.builder()
-            .firstName("User")
-            .lastName("Demo")
-            .email(userUsername)
-            .password(userPassword)
-            .confirmPassword(userPassword)
-            .role(ROLE_USER)
-            .enabled(true)
-            .accountNonLocked(true)
-            .build();
+                .firstName("User")
+                .lastName("Demo")
+                .email(userUsername)
+                .password(userPassword)
+                .confirmPassword(userPassword)
+                .role(ROLE_USER)
+                .enabled(true)
+                .accountNonLocked(true)
+                .build();
     }
 
     @Override
