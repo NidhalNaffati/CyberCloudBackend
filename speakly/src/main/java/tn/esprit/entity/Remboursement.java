@@ -9,7 +9,8 @@ import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Data
 @NoArgsConstructor
@@ -22,6 +23,7 @@ public class Remboursement implements Serializable {
     Long id;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     Facture facture;
     LocalDate dateRemboursement;
     LocalDate dateResponse;

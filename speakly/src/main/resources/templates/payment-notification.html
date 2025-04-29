@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Facture</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ccc; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+<p>Bonjour <strong th:text="${name}">Client</strong>,</p>
+
+<p>Merci pour votre paiement de <strong th:text="${montant}">0</strong> TND.</p>
+
+<h4>Détails de la facture :</h4>
+<table>
+    <thead>
+    <tr>
+        <th>Référence</th>
+        <th>Médecin</th>
+        <th>Date</th>
+        <th>Montant</th>
+        <th>Statut</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td th:text="${facture.reference}"></td>
+        <td th:text="${facture.doctor.firstName}"></td>
+        <td th:text="${facture.date}"></td>
+        <td th:text="${facture.montant} + ' TND'"></td>
+        <td th:text="${facture.statut}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<p>Vous trouverez votre facture en pièce jointe.</p>
+<p>Cordialement,</p>
+<p>L'équipe</p>
+</body>
+</html>
