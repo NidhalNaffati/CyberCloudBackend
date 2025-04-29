@@ -72,6 +72,19 @@ jwt:
 
   secret-key: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
 
+
+
+Groq:
+  api:
+    url: https://api.groq.com/openai/v1/chat/completions
+    token: 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
+    model: llama3-70b-8192  # Groq's current flagship model
+
+huggingface:
+  api:
+    url: https://api-inference.huggingface.co/models/google/flan-t5-large
+    token: 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
+
 verification-code:
   expiration:
     account-activation: 20         # 20 minutes
