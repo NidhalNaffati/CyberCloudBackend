@@ -17,7 +17,7 @@ public class ResponseComplaint {
     User user;
 
     private String content;
-    private boolean isReadRep;
+    private boolean isReadRep=false;
 
     @ManyToOne
     @JsonBackReference

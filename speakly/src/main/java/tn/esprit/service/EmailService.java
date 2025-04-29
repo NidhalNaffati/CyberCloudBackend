@@ -71,6 +71,7 @@ public class EmailService {
     }
 
     public void sendHtmlEmail(String to, String subject, String htmlContent) {
+        log.info("Tentative d'envoi d'email à {} avec le sujet: {}", to, subject);
         MimeMessage message = mailSender.createMimeMessage();
 
         try {
@@ -99,8 +100,8 @@ public class EmailService {
     }
 
     private void sendEmailWithVerificationCode(
-        String email, String firstName, String subject, String code,
-        String template, int expirationMinutes) {
+            String email, String firstName, String subject, String code,
+            String template, int expirationMinutes) {
 
         String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
         String senderName = "Speakly Team";
@@ -117,9 +118,9 @@ public class EmailService {
             String content = new String(Files.readAllBytes(resource.getFile().toPath()));
 
             content = content.replace("{{firstName}}", firstName)
-                .replace("{{verificationCode}}", code)
-                .replace("{{currentYear}}", currentYear)
-                .replace("{{expirationTimeInMinutes}}", String.valueOf(expirationMinutes));
+                    .replace("{{verificationCode}}", code)
+                    .replace("{{currentYear}}", currentYear)
+                    .replace("{{expirationTimeInMinutes}}", String.valueOf(expirationMinutes));
 
             helper.setText(content, true);
             mailSender.send(message);
@@ -167,8 +168,8 @@ public class EmailService {
 
 
     private void sendEmailWithTemplate(
-        String email, String firstName, String subject, String url,
-        String template, long expirationTimeInMs) {
+            String email, String firstName, String subject, String url,
+            String template, long expirationTimeInMs) {
 
         String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
         int expirationTimeInMinutes = (int) (expirationTimeInMs / 60000);
@@ -186,9 +187,9 @@ public class EmailService {
             String content = new String(Files.readAllBytes(resource.getFile().toPath()));
 
             content = content.replace("{{firstName}}", firstName)
-                .replace("{{activationLink}}", url)
-                .replace("{{currentYear}}", currentYear)
-                .replace("{{expirationTimeInMinutes}}", String.valueOf(expirationTimeInMinutes));
+                    .replace("{{activationLink}}", url)
+                    .replace("{{currentYear}}", currentYear)
+                    .replace("{{expirationTimeInMinutes}}", String.valueOf(expirationTimeInMinutes));
 
             helper.setText(content, true);
             mailSender.send(message);
