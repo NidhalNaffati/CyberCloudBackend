@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import tn.esprit.dto.MedecinDocumentDto;
+import tn.esprit.DTO.MedecinDocumentDto;
 import tn.esprit.entity.MedecinDocument;
 import tn.esprit.entity.Role;
 import tn.esprit.entity.User;

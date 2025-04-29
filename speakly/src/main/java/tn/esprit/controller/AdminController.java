@@ -8,8 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tn.esprit.dto.MedecinDocumentDto;
-import tn.esprit.dto.MedecinDto;
+import tn.esprit.DTO.MedecinDocumentDto;
+import tn.esprit.DTO.MedecinDto;
 import tn.esprit.service.MedecinDocumentService;
 import tn.esprit.service.UserService;
 

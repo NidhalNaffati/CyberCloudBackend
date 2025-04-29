@@ -1,7 +1,7 @@
 package tn.esprit.service;
 
  
-import tn.esprit.dto.MedecinDto;
+import tn.esprit.DTO.MedecinDto;
 import tn.esprit.entity.Role;
 import tn.esprit.entity.User;
 import tn.esprit.exception.AccountLockedException;
