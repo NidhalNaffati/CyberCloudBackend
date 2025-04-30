@@ -78,18 +78,19 @@ public class ActivityController {
     public List<Activity> smartSearch(@RequestParam String q) {
         return activityService.smartSearchNlp(q);
     }
+
     @PostMapping("/ai/describe")
     public ResponseEntity<String> generateDescription(@RequestBody AiPrompt prompt) {
         if (prompt.getTitle() == null || prompt.getTitle().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Title cannot be empty");
         }
 
-        // Try Hugging Face first
-        String description = callHuggingFaceWithRetry(prompt.getTitle(), 3); // Retry 3 times
+        // Try Groq API first
+        String description = callGroqApi(prompt.getTitle());
 
-        // Fallback to Groq if Hugging Face fails
+        // Fallback to Hugging Face if Groq fails
         if (description.startsWith("Failed") || description.contains("unavailable")) {
-            description = callGroqApi(prompt.getTitle());
+            description = callHuggingFaceWithRetry(prompt.getTitle(), 3); // Retry 3 times
         }
 
         return ResponseEntity.ok(description);
