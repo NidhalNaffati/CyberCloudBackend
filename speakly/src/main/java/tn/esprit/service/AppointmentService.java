@@ -1,15 +1,17 @@
 package tn.esprit.service;
 
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tn.esprit.entity.Appointment;
+import tn.esprit.entity.User;
 import tn.esprit.repository.AppointmentRepository;
+import tn.esprit.repository.UserRepository;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,10 @@ public class AppointmentService {
 
     @Autowired
     private AppointmentRepository appointmentRepository;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private UserRepository userRepository;
 
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();
@@ -31,9 +37,18 @@ public class AppointmentService {
         if (!isAppointmentValid(appointment)) {
             throw new IllegalArgumentException("Rendez-vous invalide (horaire, chevauchement ou jour non autorisé).");
         }
-        return appointmentRepository.save(appointment);
-    }
 
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+
+        // Récupération de l'utilisateur à partir de l'ID
+        if (appointment.getUserId() != null) {
+
+            Optional<User> userOpt = userRepository.findById(appointment.getUserId());
+            userOpt.ifPresent(user -> sendAppointmentConfirmationEmail(user, savedAppointment));
+        }
+
+        return savedAppointment;
+    }
 
 
     public Appointment updateAppointment(Long id, Appointment newAppointment) {
@@ -75,7 +90,7 @@ public class AppointmentService {
         List<Appointment> sameDayAppointments = appointmentRepository.findByDate(newAppointment.getDate());
         for (Appointment existing : sameDayAppointments) {
             if (
-                    (start.isBefore(existing.getEndTime()) && end.isAfter(existing.getStartTime()))
+                (start.isBefore(existing.getEndTime()) && end.isAfter(existing.getStartTime()))
             ) {
                 return false; // chevauchement
             }
@@ -84,6 +99,23 @@ public class AppointmentService {
         return true;
     }
 
+    private void sendAppointmentConfirmationEmail(User user, Appointment appointment) {
+        // Formatage de la date et des heures pour l'affichage dans l'email
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
+        String formattedDate = appointment.getDate().format(dateFormatter);
+        String startTime = appointment.getStartTime().format(timeFormatter);
+        String endTime = appointment.getEndTime().format(timeFormatter);
+
+        // Utilisation du service email existant
+        emailService.sendAppointmentConfirmation(
+            user.getEmail(),
+            user.getFirstName(),
+            appointment.getDate().toString(),
+            appointment.getStartTime().toString(),
+            appointment.getEndTime().toString()
+        );
+
+    }
 }
-

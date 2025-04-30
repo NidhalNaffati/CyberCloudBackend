@@ -1,12 +1,15 @@
 package tn.esprit.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
 
 @Entity
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class,
+    property = "id")
 public class Consultation {
 
     @Id
@@ -16,14 +19,14 @@ public class Consultation {
     private String details;
     private String description;
     private LocalTime actualDuration;
-
-    @JsonBackReference("appointment-consultations")
+    //  @JsonBackReference("appointment-consultations")
     @ManyToOne
     @JoinColumn(name = "appointment_id")
     private Appointment appointment;
 
     // Constructeurs
-    public Consultation() {}
+    public Consultation() {
+    }
 
     public Consultation(String details, String description, LocalTime actualDuration, Appointment appointment) {
         this.details = details;
@@ -33,18 +36,43 @@ public class Consultation {
     }
 
     // Getters et Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getDetails() { return details; }
-    public void setDetails(String details) { this.details = details; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getDetails() {
+        return details;
+    }
 
-    public LocalTime getActualDuration() { return actualDuration; }
-    public void setActualDuration(LocalTime actualDuration) { this.actualDuration = actualDuration; }
+    public void setDetails(String details) {
+        this.details = details;
+    }
 
-    public Appointment getAppointment() { return appointment; }
-    public void setAppointment(Appointment appointment) { this.appointment = appointment; }
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalTime getActualDuration() {
+        return actualDuration;
+    }
+
+    public void setActualDuration(LocalTime actualDuration) {
+        this.actualDuration = actualDuration;
+    }
+
+    public Appointment getAppointment() {
+        return appointment;
+    }
+
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
+    }
 }

@@ -26,7 +26,7 @@ public class ConsultationController {
     public ResponseEntity<Consultation> addConsultation(@RequestBody Consultation consultation) {
         if (consultation.getAppointment() != null && consultation.getAppointment().getId() != null) {
             Appointment appointment = appointmentService.getAppointmentById(consultation.getAppointment().getId())
-                    .orElseThrow(() -> new RuntimeException("Appointment not found"));
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
             consultation.setAppointment(appointment);
         }
 
@@ -46,7 +46,7 @@ public class ConsultationController {
     @GetMapping("/{id}")
     public Consultation getConsultationById(@PathVariable Long id) {
         return consultationService.getConsultationById(id)
-                .orElseThrow(() -> new RuntimeException("Consultation not found"));
+            .orElseThrow(() -> new RuntimeException("Consultation not found"));
     }
 
     // ✅ Mettre à jour une consultation
