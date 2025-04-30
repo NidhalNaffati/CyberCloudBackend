@@ -1,27 +1,20 @@
+// AdminUserBuilder class
 package tn.esprit.config;
 
-import tn.esprit.entity.User;
-import tn.esprit.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import tn.esprit.entity.User;
+import tn.esprit.repository.UserRepository;
 
 import static tn.esprit.entity.Role.ROLE_ADMIN;
 
-/**
- * Initializes the admin user if it does not already exist.
- */
 @Slf4j
 @Component
-@RequiredArgsConstructor
-public class AdminInitializer implements ApplicationRunner {
-
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+public class AdminUserBuilder extends UserBuilder implements ApplicationRunner {
 
     @Value("${admin.username}")
     private String adminUsername;
@@ -29,30 +22,26 @@ public class AdminInitializer implements ApplicationRunner {
     @Value("${admin.password}")
     private String adminPassword;
 
+    public AdminUserBuilder(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        super(userRepository, passwordEncoder);
+    }
+
     private User buildAdminUser() {
         return User.builder()
-            .firstName("John")
-            .lastName("Naffati")
+            .firstName("admin")
+            .lastName("admin")
             .email(adminUsername)
             .password(adminPassword)
             .confirmPassword(adminPassword)
             .role(ROLE_ADMIN)
             .enabled(true)
             .accountNonLocked(true)
+            .documentsVerified(true)
             .build();
     }
 
     @Override
     public void run(ApplicationArguments args) {
-        if (userRepository.existsByEmail(adminUsername)) {
-            log.info("Admin user already exists.\n username: {}", adminUsername);
-            return;
-        }
-
-        User admin = buildAdminUser();
-        admin.setPassword(passwordEncoder.encode(adminPassword));
-        userRepository.save(admin);
-
-        log.info("Admin user created successfully. username: {}", adminUsername);
+        initializeUser(adminUsername, this::buildAdminUser, "Admin");
     }
 }
