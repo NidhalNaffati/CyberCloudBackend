@@ -14,7 +14,8 @@ public interface FactureService {
     Facture getFactureById(Long id);
 
     Facture modifierFacture(Long id, FactureDTO facture);
-    Facture updateStatus(Long id,String status);
+
+    Facture updateStatus(Long id, String status);
 
     void supprimerFacture(Long id);
 

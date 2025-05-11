@@ -17,14 +17,14 @@ public class FactureServiceImpl implements FactureService {
 
     private final FactureRepository factureRepository;
 
-
     private final UserRepository userRepository;
+
     @Override
     public Facture ajouterFacture(Facture facture, Long idDoctor, Long idPatient) {
         User doctor = userRepository.findById(idDoctor)
-                .orElseThrow(() -> new RuntimeException("USER NOT FOUND!"));
-        User patient=userRepository.findById(idPatient)
-                .orElseThrow(() -> new RuntimeException("USER NOT FOUND!"));
+            .orElseThrow(() -> new RuntimeException("USER NOT FOUND!"));
+        User patient = userRepository.findById(idPatient)
+            .orElseThrow(() -> new RuntimeException("USER NOT FOUND!"));
 
         facture.setDoctor(doctor);
         facture.setPatient(patient);
@@ -41,28 +41,27 @@ public class FactureServiceImpl implements FactureService {
     @Override
     public Facture getFactureById(Long id) {
         return factureRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Facture non trouvée avec l'ID : " + id));
+            .orElseThrow(() -> new RuntimeException("Facture non trouvée avec l'ID : " + id));
     }
 
     @Override
     public Facture modifierFacture(Long id, FactureDTO nouvelleFacture) {
         Facture factureExistante = getFactureById(id);
-        if(nouvelleFacture.getMontant()!=null && nouvelleFacture.getMontant()!=0)
-        factureExistante.setMontant(nouvelleFacture.getMontant());
-        if(nouvelleFacture.getDoctorId()!=null&& nouvelleFacture.getDoctorId()!=0)
-        {
-             User doctor = userRepository.findById(nouvelleFacture.getDoctorId())
-                    .orElseThrow(() -> new RuntimeException("USER NOT FOUND!"));
+        if (nouvelleFacture.getMontant() != null && nouvelleFacture.getMontant() != 0)
+            factureExistante.setMontant(nouvelleFacture.getMontant());
+        if (nouvelleFacture.getDoctorId() != null && nouvelleFacture.getDoctorId() != 0) {
+            User doctor = userRepository.findById(nouvelleFacture.getDoctorId())
+                .orElseThrow(() -> new RuntimeException("USER NOT FOUND!"));
 
             factureExistante.setDoctor(doctor);
         }
-        if(nouvelleFacture.getPatientId()!=null&& nouvelleFacture.getPatientId()!=0) {
+        if (nouvelleFacture.getPatientId() != null && nouvelleFacture.getPatientId() != 0) {
             User patient = userRepository.findById(nouvelleFacture.getPatientId())
-                    .orElseThrow(() -> new RuntimeException("USER NOT FOUND!"));
+                .orElseThrow(() -> new RuntimeException("USER NOT FOUND!"));
 
-             factureExistante.setPatient(patient);
+            factureExistante.setPatient(patient);
         }
-        if(nouvelleFacture.getStatut()!=null){
+        if (nouvelleFacture.getStatut() != null) {
             factureExistante.setStatut(nouvelleFacture.getStatut());
         }
         return factureRepository.save(factureExistante);
@@ -70,7 +69,7 @@ public class FactureServiceImpl implements FactureService {
 
     @Override
     public Facture updateStatus(Long id, String status) {
-        Facture f=factureRepository.findById(id).orElseThrow();
+        Facture f = factureRepository.findById(id).orElseThrow();
         f.setStatut(status);
         return factureRepository.save(f);
 
@@ -87,9 +86,9 @@ public class FactureServiceImpl implements FactureService {
     @Override
     public List<Facture> getFactureByPatientId(Long patientId) {
         User patient = userRepository.findById(patientId)
-                .orElseThrow(() -> new RuntimeException("USER NOT FOUND!"));
+            .orElseThrow(() -> new RuntimeException("USER NOT FOUND!"));
 
         return factureRepository.findFactureByPatient(patient);
-     }
+    }
 
 }
