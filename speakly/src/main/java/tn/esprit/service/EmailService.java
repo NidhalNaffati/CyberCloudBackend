@@ -11,17 +11,18 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import tn.esprit.entity.Facture;
+import tn.esprit.entity.Remboursement;
+import tn.esprit.utils.PDFUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
-
-import org.thymeleaf.context.Context;
-import tn.esprit.entity.Remboursement;
-import tn.esprit.utils.PDFUtils;
 
 @Slf4j
 @Service
@@ -115,8 +116,12 @@ public class EmailService {
             helper.setTo(email);
             helper.setSubject(subject);
 
+            // Read template from classpath using InputStream instead of File
             ClassPathResource resource = new ClassPathResource(template);
-            String content = new String(Files.readAllBytes(resource.getFile().toPath()));
+            String content;
+            try (InputStream inputStream = resource.getInputStream()) {
+                content = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+            }
 
             content = content.replace("{{firstName}}", firstName)
                 .replace("{{verificationCode}}", code)
@@ -184,8 +189,12 @@ public class EmailService {
             helper.setTo(email);
             helper.setSubject(subject);
 
+            // Read template from classpath using InputStream
             ClassPathResource resource = new ClassPathResource(template);
-            String content = new String(Files.readAllBytes(resource.getFile().toPath()));
+            String content;
+            try (InputStream inputStream = resource.getInputStream()) {
+                content = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+            }
 
             content = content.replace("{{firstName}}", firstName)
                 .replace("{{activationLink}}", url)
@@ -261,9 +270,12 @@ public class EmailService {
             helper.setTo(email);
             helper.setSubject(subject);
 
-            // Load email template from file
+            // Load email template using InputStream
             ClassPathResource resource = new ClassPathResource(template);
-            String content = new String(Files.readAllBytes(resource.getFile().toPath()));
+            String content;
+            try (InputStream inputStream = resource.getInputStream()) {
+                content = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+            }
 
             // Replace placeholders in email template
             content = content.replace("{{firstName}}", firstName);
@@ -294,9 +306,12 @@ public class EmailService {
             helper.setTo(email);
             helper.setSubject(subject);
 
-            // Load and process template
+            // Load template using InputStream
             ClassPathResource resource = new ClassPathResource(template);
-            String content = new String(Files.readAllBytes(resource.getFile().toPath()));
+            String content;
+            try (InputStream inputStream = resource.getInputStream()) {
+                content = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+            }
 
             content = content.replace("{{firstName}}", firstName)
                 .replace("{{appointmentDate}}", appointmentDate)
